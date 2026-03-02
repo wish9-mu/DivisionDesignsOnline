@@ -3,20 +3,72 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: #333;
-    color: white;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+    color: #F8EEDF;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 100;
     box-sizing: border-box;
     gap: 2rem;
+    transition: background 0.35s ease;
 }
 
-.navbar-brand h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    white-space: nowrap;
+/* Scrolled state */
+.navbar.scrolled {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.navbar.scrolled .navbar-logo {
+    filter: none;
+}
+
+.navbar.scrolled .navbar-links a {
+    color: #000000;
+}
+
+.navbar.scrolled .navbar-links a:hover {
+    color: #8E1616;
+}
+
+.navbar.scrolled .search-input {
+    color: #000000;
+}
+
+.navbar.scrolled .search-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+.navbar.scrolled .search-button {
+    color: #000000;
+}
+
+.navbar.scrolled .search-button:hover {
+    color: #8E1616;
+}
+
+.navbar.scrolled .search-bar {
+    background-color: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.navbar.scrolled .search-bar:focus-within {
+    border-color: #8E1616;
+}
+
+.navbar-logo {
+    height: 28px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    filter: invert(1) drop-shadow(0 0 4px rgba(248, 238, 223, 0.15));
+    transition: opacity 0.2s ease;
+}
+
+.navbar-logo:hover {
+    opacity: 0.8;
 }
 
 .navbar-links {
@@ -29,7 +81,7 @@
 }
 
 .navbar-links a {
-    color: white;
+    color: #F8EEDF;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
@@ -37,48 +89,50 @@
 }
 
 .navbar-links a:hover {
-    color: #646cff;
+    color: #E8C999;
 }
 
-/* Right section with search and profile */
+/* Right section */
 .navbar-right {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-/* Search bar styles */
+/* Search bar */
 .search-bar {
     display: flex;
     align-items: center;
-    background-color: #444;
+    background-color: rgba(248, 238, 223, 0.1);
+    border: 1px solid rgba(248, 238, 223, 0.2);
     border-radius: 20px;
     padding: 0.4rem 0.8rem;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
 .search-bar:focus-within {
-    background-color: #555;
+    background-color: rgba(232, 201, 153, 0.15);
+    border-color: #E8C999;
 }
 
 .search-input {
     background: transparent;
     border: none;
     outline: none;
-    color: white;
+    color: #F8EEDF;
     padding: 0.2rem 0.5rem;
     width: 200px;
     font-size: 0.9rem;
 }
 
 .search-input::placeholder {
-    color: #aaa;
+    color: rgba(248, 238, 223, 0.45);
 }
 
 .search-button {
     background: transparent;
     border: none;
-    color: white;
+    color: #F8EEDF;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -88,15 +142,15 @@
 }
 
 .search-button:hover {
-    color: #ffffff;
+    color: #E8C999;
 }
 
-/* Profile circle styles */
+/* Profile circle */
 .profile-circle {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: white;
+    background: #8E1616;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -104,14 +158,15 @@
     transition: transform 0.3s, box-shadow 0.3s;
     font-weight: 600;
     font-size: 1.1rem;
+    color: #F8EEDF;
 }
 
 .profile-circle:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(142, 22, 22, 0.5);
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
     .navbar {
         flex-wrap: wrap;
@@ -128,4 +183,46 @@
     .search-input {
         width: 150px;
     }
+}
+
+/* Cart button */
+.navbar-cart-btn {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #F8EEDF;
+    padding: 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s, color 0.3s;
+    border-radius: 6px;
+}
+
+.navbar.scrolled .navbar-cart-btn {
+    color: #000000;
+}
+
+.navbar-cart-btn:hover {
+    opacity: 0.7;
+}
+
+.navbar-cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: #8E1616;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+    pointer-events: none;
 }

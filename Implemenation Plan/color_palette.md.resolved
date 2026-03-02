@@ -1,0 +1,30 @@
+# Division Designs — Color Palette
+
+| Swatch | Hex | Name | Role |
+|--------|-----|------|------|
+| 🟫 | `#000000` | Black | Main backgrounds (hero, featured section), buttons, footer |
+| 🟥 | `#8E1616` | Deep Red | Accents — category labels, badges, hover states, prices, CTA buttons, active tabs |
+| 🟨 | `#E8C999` | Gold | Product image placeholders, HomeAbout background, subtle highlights |
+| 🟪 | `#F8EEDF` | Cream | Button text on dark backgrounds, logo (on dark), card text |
+
+---
+
+## Usage by Component
+
+| Component | Background | Primary Text | Accent |
+|-----------|-----------|-------------|--------|
+| **Navbar** (transparent, on hero) | Transparent → gradient | `#F8EEDF` cream | `#E8C999` hover |
+| **Navbar** (scrolled / inner pages) | `#ffffff` white | `#000000` black | `#8E1616` hover |
+| **Hero** | `#000000` black | `#F8EEDF` cream | `#E8C999` active dot |
+| **Featured Product** | `#ffffff` white | `#000000` black | `#8E1616` price & category |
+| **Qty Control** | `#8E1616` red | `#ffffff` white | — |
+| **Add to Cart button** | Transparent / `#000000` on hover | `#000000` / `#ffffff` on hover | — |
+| **HomeAbout section** | `#F8EEDF` cream | `#000000` black | `#8E1616` "Our Story" button |
+| **Products grid cards** | `#ffffff` white | `#000000` black | `#8E1616` type label, tag badge |
+| **Page tabs (active)** | — | `#8E1616` | `#8E1616` underline |
+| **CTA buttons (pages)** | `#000000` black | `#F8EEDF` cream | `#8E1616` hover fill |
+| **Cart sidebar** | `#ffffff` white | `#000000` black | `#8E1616` category, checkout btn |
+| **About stats section** | `#000000` black | `#E8C999` numbers | `rgba(#F8EEDF, 0.6)` labels |
+| **Footer** | Dark | `#F8EEDF` cream | — |
+| **Profile avatar** | `#8E1616` red | `#F8EEDF` cream | — |
+| **Page background** | `#ffffff` white | — | — |

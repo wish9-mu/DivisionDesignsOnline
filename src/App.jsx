@@ -1,26 +1,30 @@
-import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
-import Layout from './components/Layout'
+import ScrollToTop from './components/ScrollToTop'
+import HomePage from './pages/HomePage'
+import ProductsPage from './pages/ProductsPage'
+import OrderFormsPage from './pages/OrderFormsPage'
+import CustomOrdersPage from './pages/CustomOrdersPage'
+import AboutPage from './pages/AboutPage'
+import ProfilePage from './pages/ProfilePage'
+import SignInPage from './pages/SignInPage'
+import SignUpPage from './pages/SignUpPage'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <Layout>
-      <div className="home-content">
-        <h1>Welcome to Division Designs</h1>
-        <p>This is a basic website template built with React and Vite.</p>
-
-        <div className="card">
-          <button onClick={() => setCount((count) => count + 1)}>
-            count is {count}
-          </button>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test HMR
-          </p>
-        </div>
-      </div>
-    </Layout>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/order-forms" element={<OrderFormsPage />} />
+        <Route path="/custom-orders" element={<CustomOrdersPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+      </Routes>
+    </>
   )
 }
 

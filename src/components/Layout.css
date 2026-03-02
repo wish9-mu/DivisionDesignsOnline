@@ -4,11 +4,16 @@
     min-height: 100vh;
 }
 
+/* Hero sits between the navbar and main content, full-viewport-width */
+.hero-wrapper {
+    width: 100%;
+    flex-shrink: 0;
+}
+
 .main-content {
     flex: 1;
     padding: 2rem;
-    padding-top: 100px;
-    /* Space for fixed navbar */
+    padding-top: 5.5rem;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;

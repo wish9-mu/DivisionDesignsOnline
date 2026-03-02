@@ -1,0 +1,110 @@
+/* ── Section ───────────────────────────────────────────────── */
+.home-about {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5rem;
+    padding: 6rem 4rem 7rem;
+    background: #8E1616;
+    overflow: hidden;
+}
+
+/* ── Stacked Photos ────────────────────────────────────────── */
+.home-about__images {
+    position: relative;
+    flex-shrink: 0;
+    width: 340px;
+    height: 380px;
+}
+
+.home-about__img {
+    position: absolute;
+    width: 260px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Back photo: tilted left, shifted up */
+.home-about__img--back {
+    top: 0;
+    left: 0;
+    transform: rotate(-5deg);
+    z-index: 1;
+}
+
+/* Front photo: tilted right, shifted down-right */
+.home-about__img--front {
+    bottom: 0;
+    right: 0;
+    transform: rotate(4deg);
+    z-index: 2;
+}
+
+/* ── Text ──────────────────────────────────────────────────── */
+.home-about__text {
+    flex: 1;
+    color: #F8EEDF;
+    max-width: 480px;
+}
+
+.home-about__headline {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    line-height: 1.15;
+    margin: 0 0 1.2rem;
+    color: #F8EEDF;
+}
+
+.home-about__body {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(248, 238, 223, 0.8);
+    margin: 0 0 2rem;
+}
+
+.home-about__body strong {
+    color: #E8C999;
+    font-weight: 700;
+}
+
+/* ── CTA Button ────────────────────────────────────────────── */
+.home-about__btn {
+    display: inline-block;
+    padding: 0.85rem 2rem;
+    background: #E8C999;
+    color: #000000;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.25s, transform 0.15s;
+}
+
+.home-about__btn:hover {
+    background: #a01a1a;
+    transform: translateY(-2px);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 750px) {
+    .home-about {
+        flex-direction: column;
+        padding: 4rem 1.5rem 5rem;
+        gap: 3rem;
+        text-align: center;
+    }
+
+    .home-about__images {
+        width: 280px;
+        height: 300px;
+    }
+
+    .home-about__img {
+        width: 200px;
+        height: 240px;
+    }
+}

@@ -4,6 +4,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
+import ProductDetailPage from './pages/ProductDetailPage';
 import OrderFormsPage from "./pages/OrderFormsPage";
 import CustomOrdersPage from "./pages/CustomOrdersPage";
 import AboutPage from "./pages/AboutPage";
@@ -11,14 +12,18 @@ import ProfilePage from "./pages/ProfilePage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import AdminPage from "./pages/AdminPage";
+import { CartProvider } from "./context/CartContext";
+
 
 function App() {
   return (
     <AuthProvider>
+      <CartProvider>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/order-forms" element={<OrderFormsPage />} />
         <Route path="/custom-orders" element={<CustomOrdersPage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -27,6 +32,7 @@ function App() {
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
+      </CartProvider>
     </AuthProvider>
   );
 }

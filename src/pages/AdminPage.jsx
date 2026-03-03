@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import './AdminPage.css';
 
-// ── Mock Data ────────────────────────────────────────────────
+// ── Mock Data (fallback if Supabase is not set up) ───────────
 const initialProducts = [
     { id: 'p1', type: 'Standard Lanyards', name: 'Classic Black Lanyard', price: 120, tag: 'Bestseller', stock: 84 },
     { id: 'p2', type: 'Standard Lanyards', name: 'Woven Red Lanyard', price: 150, tag: 'New', stock: 56 },
@@ -38,11 +39,9 @@ const initialAppointments = [
 const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered'];
 const CUSTOM_STATUSES = ['Pending Review', 'In Progress', 'Completed'];
 const APPOINTMENT_STATUSES = ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'];
-const APPOINTMENT_TYPES = ['Design Consultation', 'Order Pickup', 'Sample Review'];
 
 const emptyProduct = { name: '', type: 'Standard Lanyards', price: '', tag: 'New', stock: '' };
 
-// ── Sidebar Nav Config ───────────────────────────────────────
 const NAV_ITEMS = [
     { key: 'dashboard', label: 'Dashboard' },
     { key: 'products', label: 'Products' },
@@ -51,29 +50,38 @@ const NAV_ITEMS = [
     { key: 'appointments', label: 'Appointments' },
 ];
 
-// ══════════════════════════════════════════════════════════════
-// AdminPage Component
-// ══════════════════════════════════════════════════════════════
 const AdminPage = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
-    // Products state
     const [products, setProducts] = useState(initialProducts);
     const [showModal, setShowModal] = useState(false);
     const [editProduct, setEditProduct] = useState(null);
     const [formData, setFormData] = useState(emptyProduct);
-
-    // Orders state
+    const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
     const [orders, setOrders] = useState(initialOrders);
-
-    // Custom orders state
     const [customOrders, setCustomOrders] = useState(initialCustomOrders);
-
-    // Appointments state
     const [appointments, setAppointments] = useState(initialAppointments);
 
-    // ── Product CRUD ─────────────────────────────────────────
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const { data, error } = await supabase
+                .from('products')
+                .select('*')
+                .order('created_at', { ascending: true });
+            
+            if (error) {
+                console.log('Using local products (Supabase not connected or table not set up)');
+                setIsSupabaseConnected(false);
+            } else if (data && data.length > 0) {
+                setProducts(data);
+                setIsSupabaseConnected(true);
+                console.log('Products loaded from Supabase:', data.length, 'items');
+            }
+        };
+        
+        fetchProducts();
+    }, []);
+
     const openAddModal = () => {
         setEditProduct(null);
         setFormData(emptyProduct);
@@ -86,22 +94,48 @@ const AdminPage = () => {
         setShowModal(true);
     };
 
-    const handleSaveProduct = () => {
+    const handleSaveProduct = async () => {
         if (!formData.name || !formData.price) return;
+        
+        const productData = {
+            name: formData.name,
+            type: formData.type,
+            price: Number(formData.price),
+            tag: formData.tag,
+            stock: Number(formData.stock) || 0
+        };
+        
         if (editProduct) {
-            setProducts(prev => prev.map(p => p.id === editProduct.id ? { ...p, ...formData, price: Number(formData.price), stock: Number(formData.stock) } : p));
+            const { error } = await supabase
+                .from('products')
+                .update(productData)
+                .eq('id', editProduct.id);
+            
+            if (!error) {
+                setProducts(prev => prev.map(p => p.id === editProduct.id ? { ...p, ...productData } : p));
+            }
         } else {
-            const newProduct = { ...formData, id: `p${Date.now()}`, price: Number(formData.price), stock: Number(formData.stock) };
-            setProducts(prev => [...prev, newProduct]);
+            const { data, error } = await supabase
+                .from('products')
+                .insert([productData])
+                .select();
+            
+            if (!error && data) {
+                setProducts(prev => [...prev, data[0]]);
+            }
         }
         setShowModal(false);
     };
 
-    const handleDeleteProduct = (id) => {
+    const handleDeleteProduct = async (id) => {
+        await supabase
+            .from('products')
+            .delete()
+            .eq('id', id);
+        
         setProducts(prev => prev.filter(p => p.id !== id));
     };
 
-    // ── Order Status ─────────────────────────────────────────
     const updateOrderStatus = (id, status) => {
         setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
     };
@@ -114,12 +148,10 @@ const AdminPage = () => {
         setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
     };
 
-    // ── Computed stats ───────────────────────────────────────
     const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
     const pendingCustom = customOrders.filter(o => o.status === 'Pending Review').length;
     const upcomingAppointments = appointments.filter(a => a.status === 'Scheduled' || a.status === 'Confirmed').length;
 
-    // ── Render helpers ───────────────────────────────────────
     const badgeClass = (status) => {
         const map = {
             'Pending': 'pending', 'Processing': 'processing', 'Shipped': 'shipped', 'Delivered': 'delivered',
@@ -132,7 +164,6 @@ const AdminPage = () => {
 
     return (
         <div className="admin">
-            {/* ── Sidebar ──────────────────────────────── */}
             <aside className={`admin__sidebar${sidebarOpen ? ' admin__sidebar--open' : ''}`}>
                 <div className="admin__sidebar-brand">
                     <div className="admin__sidebar-logo">DD</div>
@@ -141,7 +172,6 @@ const AdminPage = () => {
                         <span>Admin Panel</span>
                     </div>
                 </div>
-
                 <nav className="admin__sidebar-nav">
                     <p className="admin__sidebar-label">Management</p>
                     {NAV_ITEMS.map(item => (
@@ -150,26 +180,19 @@ const AdminPage = () => {
                             className={`admin__nav-item${activeTab === item.key ? ' admin__nav-item--active' : ''}`}
                             onClick={() => { setActiveTab(item.key); setSidebarOpen(false); }}
                         >
-                            <span className="admin__nav-icon">{item.icon}</span>
                             {item.label}
                         </button>
                     ))}
                 </nav>
-
                 <div className="admin__sidebar-footer">
-                    <Link to="/" className="admin__back-link">
-                        ← Back to Store
-                    </Link>
+                    <Link to="/" className="admin__back-link">← Back to Store</Link>
                 </div>
             </aside>
 
-            {/* ── Main Area ────────────────────────────── */}
             <div className="admin__main">
                 <header className="admin__topbar">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <button className="admin__hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                            ☰
-                        </button>
+                        <button className="admin__hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
                         <div className="admin__topbar-left">
                             <h1>{NAV_ITEMS.find(i => i.key === activeTab)?.label}</h1>
                             <p>Manage your Division Designs store</p>
@@ -181,7 +204,6 @@ const AdminPage = () => {
                 </header>
 
                 <div className="admin__content">
-                    {/* ═══ DASHBOARD TAB ═══ */}
                     {activeTab === 'dashboard' && (
                         <>
                             <div className="admin__stats">
@@ -206,8 +228,6 @@ const AdminPage = () => {
                                     <div className="admin__stat-label">Upcoming Appts</div>
                                 </div>
                             </div>
-
-                            {/* Recent Orders */}
                             <div className="admin__section-header">
                                 <h2 className="admin__section-title">Recent Orders</h2>
                             </div>
@@ -215,12 +235,7 @@ const AdminPage = () => {
                                 <table className="admin__table">
                                     <thead>
                                         <tr>
-                                            <th>Order ID</th>
-                                            <th>Customer</th>
-                                            <th>Items</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
+                                            <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -240,25 +255,20 @@ const AdminPage = () => {
                         </>
                     )}
 
-                    {/* ═══ PRODUCTS TAB ═══ */}
                     {activeTab === 'products' && (
                         <>
                             <div className="admin__section-header">
                                 <h2 className="admin__section-title">All Products ({products.length})</h2>
-                                <button className="admin__add-btn" onClick={openAddModal}>
-                                    + Add Product
-                                </button>
+                                <button className="admin__add-btn" onClick={openAddModal}>+ Add Product</button>
+                            </div>
+                            <div style={{ marginBottom: '1rem', padding: '0.75rem', background: isSupabaseConnected ? '#d4edda' : '#fff3cd', borderRadius: '4px', fontSize: '0.875rem', border: '1px solid' + (isSupabaseConnected ? '#c3e6cb' : '#ffeeba') }}>
+                                {isSupabaseConnected ? '✅ Connected to Supabase - Products are loaded from database' : '⚠️ Using local data - Supabase not connected or table not set up'}
                             </div>
                             <div className="admin__table-wrap">
                                 <table className="admin__table">
                                     <thead>
                                         <tr>
-                                            <th>Product</th>
-                                            <th>Type</th>
-                                            <th>Price</th>
-                                            <th>Stock</th>
-                                            <th>Tag</th>
-                                            <th>Actions</th>
+                                            <th>Product</th><th>Type</th><th>Price</th><th>Stock</th><th>Tag</th><th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -288,7 +298,6 @@ const AdminPage = () => {
                         </>
                     )}
 
-                    {/* ═══ ORDERS TAB ═══ */}
                     {activeTab === 'orders' && (
                         <>
                             <div className="admin__section-header">
@@ -298,13 +307,7 @@ const AdminPage = () => {
                                 <table className="admin__table">
                                     <thead>
                                         <tr>
-                                            <th>Order ID</th>
-                                            <th>Customer</th>
-                                            <th>Email</th>
-                                            <th>Items</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
+                                            <th>Order ID</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -316,11 +319,7 @@ const AdminPage = () => {
                                                 <td>{order.items}</td>
                                                 <td style={{ fontWeight: 700 }}>₱{order.total.toLocaleString()}</td>
                                                 <td>
-                                                    <select
-                                                        className="admin__status-select"
-                                                        value={order.status}
-                                                        onChange={e => updateOrderStatus(order.id, e.target.value)}
-                                                    >
+                                                    <select className="admin__status-select" value={order.status} onChange={e => updateOrderStatus(order.id, e.target.value)}>
                                                         {ORDER_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                                     </select>
                                                 </td>
@@ -333,7 +332,6 @@ const AdminPage = () => {
                         </>
                     )}
 
-                    {/* ═══ CUSTOM ORDERS TAB ═══ */}
                     {activeTab === 'custom' && (
                         <>
                             <div className="admin__section-header">
@@ -343,15 +341,7 @@ const AdminPage = () => {
                                 <table className="admin__table">
                                     <thead>
                                         <tr>
-                                            <th>Reference ID</th>
-                                            <th>Organization</th>
-                                            <th>Email</th>
-                                            <th>Qty</th>
-                                            <th>Material</th>
-                                            <th>Size</th>
-                                            <th>Print</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
+                                            <th>Reference ID</th><th>Organization</th><th>Email</th><th>Qty</th><th>Material</th><th>Size</th><th>Print</th><th>Status</th><th>Date</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -365,11 +355,7 @@ const AdminPage = () => {
                                                 <td>{order.size}</td>
                                                 <td>{order.print}</td>
                                                 <td>
-                                                    <select
-                                                        className="admin__status-select"
-                                                        value={order.status}
-                                                        onChange={e => updateCustomStatus(order.id, e.target.value)}
-                                                    >
+                                                    <select className="admin__status-select" value={order.status} onChange={e => updateCustomStatus(order.id, e.target.value)}>
                                                         {CUSTOM_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                                     </select>
                                                 </td>
@@ -382,7 +368,6 @@ const AdminPage = () => {
                         </>
                     )}
 
-                    {/* ═══ APPOINTMENTS TAB ═══ */}
                     {activeTab === 'appointments' && (
                         <>
                             <div className="admin__section-header">
@@ -392,15 +377,7 @@ const AdminPage = () => {
                                 <table className="admin__table">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
-                                            <th>Customer</th>
-                                            <th>Email</th>
-                                            <th>Phone</th>
-                                            <th>Type</th>
-                                            <th>Date</th>
-                                            <th>Time</th>
-                                            <th>Notes</th>
-                                            <th>Status</th>
+                                            <th>ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Type</th><th>Date</th><th>Time</th><th>Notes</th><th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -415,11 +392,7 @@ const AdminPage = () => {
                                                 <td>{apt.time}</td>
                                                 <td style={{ color: 'rgba(0,0,0,0.55)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{apt.notes}</td>
                                                 <td>
-                                                    <select
-                                                        className="admin__status-select"
-                                                        value={apt.status}
-                                                        onChange={e => updateAppointmentStatus(apt.id, e.target.value)}
-                                                    >
+                                                    <select className="admin__status-select" value={apt.status} onChange={e => updateAppointmentStatus(apt.id, e.target.value)}>
                                                         {APPOINTMENT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                                     </select>
                                                 </td>
@@ -433,7 +406,6 @@ const AdminPage = () => {
                 </div>
             </div>
 
-            {/* ── Product Modal ────────────────────────── */}
             {showModal && (
                 <div className="admin__modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="admin__modal" onClick={e => e.stopPropagation()}>
@@ -444,12 +416,7 @@ const AdminPage = () => {
                         <div className="admin__modal-body">
                             <div className="admin__form-group">
                                 <label>Product Name</label>
-                                <input
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="e.g. Classic Black Lanyard"
-                                />
+                                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Classic Black Lanyard" />
                             </div>
                             <div className="admin__form-row">
                                 <div className="admin__form-group">
@@ -473,31 +440,17 @@ const AdminPage = () => {
                             <div className="admin__form-row">
                                 <div className="admin__form-group">
                                     <label>Price (₱)</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.price}
-                                        onChange={e => setFormData({ ...formData, price: e.target.value })}
-                                        placeholder="e.g. 120"
-                                    />
+                                    <input type="number" min="0" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} placeholder="e.g. 120" />
                                 </div>
                                 <div className="admin__form-group">
                                     <label>Stock</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.stock}
-                                        onChange={e => setFormData({ ...formData, stock: e.target.value })}
-                                        placeholder="0 = made to order"
-                                    />
+                                    <input type="number" min="0" value={formData.stock} onChange={e => setFormData({ ...formData, stock: e.target.value })} placeholder="0 = made to order" />
                                 </div>
                             </div>
                         </div>
                         <div className="admin__modal-footer">
                             <button className="admin__modal-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-                            <button className="admin__modal-save" onClick={handleSaveProduct}>
-                                {editProduct ? 'Save Changes' : 'Add Product'}
-                            </button>
+                            <button className="admin__modal-save" onClick={handleSaveProduct}>{editProduct ? 'Save Changes' : 'Add Product'}</button>
                         </div>
                     </div>
                 </div>

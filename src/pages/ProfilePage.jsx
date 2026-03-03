@@ -32,7 +32,7 @@ const ProfilePage = () => {
     return created
       ? created.toLocaleDateString(undefined, { month: "long", year: "numeric" })
       : "";
-  }, [user?.created_at]);
+  }, [user]);
 
   const initials = useMemo(() => {
     const name = (profile.full_name || "").trim();

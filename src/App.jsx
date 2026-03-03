@@ -19,7 +19,7 @@ import {
     termsOfService,
     contactInfo,
 } from './data/policies';
-
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
   return (

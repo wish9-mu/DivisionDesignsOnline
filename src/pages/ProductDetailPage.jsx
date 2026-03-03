@@ -5,9 +5,6 @@ import { useCart } from "../context/CartContext";
 import { supabase } from "../supabaseClient";
 import "./ProductDetailPage.css";
 
-// Importing product data
-import { products } from "../data/products";
-
 // accordion data
 import { accordionSections } from "../data/accordionData";
 
@@ -25,40 +22,74 @@ const StarRating = ({ rating }) => (
   </div>
 );
 
+// Default images
+const DEFAULT_IMAGES = [null, null, null];
+
 // ══════════════════════════════════════════════════════════════
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const { addItem } = useCart();
 
-  const product = products.find((p) => p.id === productId);
-
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(
-    () => product?.sizes[0] || ""
-  );
-  const [selectedMaterial, setSelectedMaterial] = useState(
-    () => product?.materials[0] ?? ""
-  );
   const [qty, setQty] = useState(1);
   const [openAccordion, setOpenAccordion] = useState(null);
   const [reviews, setReviews] = useState([]);
+
+  // Fetch product from Supabase
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+      
+      if (!error && data) {
+        setProduct(data);
+      }
+      setLoading(false);
+    };
+
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
 
   // Fetch reviews from Supabase
   useEffect(() => {
     if (!productId) return;
 
     const fetchReviews = async () => {
-      const { data, error } = await supabase
-        .from("product_reviews")
-        .select("*")
-        .eq("product_id", productId)
-        .order("created_at", { ascending: false });
+      try {
+        const { data } = await supabase
+          .from("product_reviews")
+          .select("*")
+          .eq("product_id", productId)
+          .order("created_at", { ascending: false });
 
-      if (!error && data) setReviews(data);
+        if (data) setReviews(data);
+      } catch {
+        console.log("Reviews not available");
+      }
     };
 
     fetchReviews();
   }, [productId]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="page">
+          <div className="pdp-not-found">
+            <h2>Loading...</h2>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -85,10 +116,10 @@ const ProductDetailPage = () => {
       ...product,
       category: product.type,
       qty,
-      size: selectedSize,
-      material: selectedMaterial,
     });
   };
+
+  const productImages = product?.images || DEFAULT_IMAGES;
 
   const avgRating =
     reviews.length > 0
@@ -123,7 +154,7 @@ const ProductDetailPage = () => {
               </div>
             </div>
             <div className="pdp-gallery__thumbs">
-              {product.images.map((_, i) => (
+              {productImages.map((_, i) => (
                 <button
                   key={i}
                   className={`pdp-gallery__thumb${selectedImage === i ? " pdp-gallery__thumb--active" : ""}`}
@@ -153,41 +184,9 @@ const ProductDetailPage = () => {
               <span className="pdp-info__type">{product.type}</span>
             </div>
 
-            <p className="pdp-info__description">{product.description}</p>
+            <p className="pdp-info__description">{product.description || "No description available."}</p>
 
-            <p className="pdp-info__price">₱{product.price.toFixed(2)}</p>
-
-            {/* Size Selector */}
-            <div className="pdp-option">
-              <label className="pdp-option__label">Size</label>
-              <div className="pdp-option__chips">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    className={`pdp-chip${selectedSize === size ? " pdp-chip--active" : ""}`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Material Selector */}
-            <div className="pdp-option">
-              <label className="pdp-option__label">Material</label>
-              <div className="pdp-option__chips">
-                {product.materials.map((mat) => (
-                  <button
-                    key={mat}
-                    className={`pdp-chip${selectedMaterial === mat ? " pdp-chip--active" : ""}`}
-                    onClick={() => setSelectedMaterial(mat)}
-                  >
-                    {mat}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <p className="pdp-info__price">₱{Number(product.price).toFixed(2)}</p>
 
             {/* Quantity */}
             <div className="pdp-option">

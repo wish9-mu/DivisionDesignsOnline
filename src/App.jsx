@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import ScrollToTop from "./components/ScrollToTop";
-import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailPage from './pages/ProductDetailPage';
@@ -29,6 +28,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/order-forms" element={<OrderFormsPage />} />

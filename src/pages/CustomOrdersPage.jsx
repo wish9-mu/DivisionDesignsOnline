@@ -52,12 +52,27 @@ const CustomOrdersPage = () => {
                                 <input type="number" min="1" placeholder="e.g. 50" required />
                             </div>
                             <div className="form-group">
-                                <label>Lanyard Type</label>
+                                <label>Material Type</label>
                                 <select>
-                                    <option>Full-Color Print</option>
-                                    <option>Embroidered Logo</option>
-                                    <option>Dye-Sublimation</option>
-                                    <option>Reversible</option>
+                                    <option>Polyester</option>
+                                    <option>Polycotton</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>Lanyard Size</label>
+                                <select>
+                                    <option>1/2 inch</option>
+                                    <option>3/4 inch</option>
+                                    <option>1 inch</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>Print Type</label>
+                                <select>
+                                    <option>Back to Back</option>
+                                    <option>One Side</option>
                                 </select>
                             </div>
                         </div>

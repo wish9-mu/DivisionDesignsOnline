@@ -1,15 +1,39 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './AuthPage.css';
 import logo from '../assets/DD LOGO.png';
+import { useAuth } from '../context/AuthContext';
 
 const SignUpPage = () => {
     const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
     const [showPass, setShowPass] = useState(false);
+    const [loadingSubmit, setLoadingSubmit] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    const navigate = useNavigate();
+    const { signUp } = useAuth();
 
     const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-    const handleSubmit = (e) => { e.preventDefault(); };
     const passwordsMatch = form.password === form.confirm || form.confirm === '';
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!passwordsMatch) return;
+        setErrorMsg(null);
+        setLoadingSubmit(true);
+        try {
+            const { data, error } = await signUp(form.email, form.password);
+            setLoadingSubmit(false);
+            if (error) {
+                setErrorMsg(error.message || 'Signup failed');
+                return;
+            }
+            navigate('/');
+        } catch (err) {
+            setLoadingSubmit(false);
+            setErrorMsg(err.message || 'An unexpected error occurred');
+        }
+    };
 
     return (
         <div className="auth-split">
@@ -80,9 +104,12 @@ const SignUpPage = () => {
                             )}
                         </div>
 
-                        <button type="submit" className="auth-form__submit" disabled={!passwordsMatch}>
-                            Create Account
+                        <button type="submit" className="auth-form__submit" disabled={!passwordsMatch || loadingSubmit}>
+                            {loadingSubmit ? 'Creating…' : 'Create Account'}
                         </button>
+                        {errorMsg && (
+                            <div className="auth-form__error" role="alert">{errorMsg}</div>
+                        )}
                     </form>
                 </div>
             </div>

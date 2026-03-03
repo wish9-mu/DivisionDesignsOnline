@@ -1,16 +1,81 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import './PageStyles.css';
+import { supabase } from '../supabaseClient';
 
 const CustomOrdersPage = () => {
     const [activeTab, setActiveTab] = useState('Submit Request');
     const [trackId, setTrackId] = useState('');
     const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e) => {
+    const [form, setForm] = useState({
+        org_name: '',
+        contact_email: '',
+        quantity: 1,
+        lanyard_type: 'Full-Color Print',
+        design_description: ''
+    });
+    const [file, setFile] = useState(null);
+    const [generatedRef, setGeneratedRef] = useState('');
+
+    const [trackResult, setTrackResult] = useState(null);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const reference_id = `DD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1e6)).padStart(6, '0')}`;
+
+        let file_url = null;
+
+        if (file) {
+            const fileExt = file.name.split('.').pop();
+            const filePath = `${reference_id}/${crypto.randomUUID()}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('custom-order-files')
+                .upload(filePath, file);
+
+            if (uploadError) return alert(uploadError.message);
+
+            const { data } = supabase.storage
+                .from('custom-order-files')
+                .getPublicUrl(filePath);
+
+            file_url = data.publicUrl;
+        }
+
+        const { error: insertError } = await supabase
+            .from('custom_orders')
+            .insert([{
+                reference_id,
+                org_name: form.org_name,
+                contact_email: form.contact_email,
+                quantity: Number(form.quantity),
+                lanyard_type: form.lanyard_type,
+                design_description: form.design_description,
+                file_url
+            }]);
+
+        if (insertError) return alert(insertError.message);
+
+        setGeneratedRef(reference_id);
         setSubmitted(true);
         setTimeout(() => setSubmitted(false), 3000);
+    };
+
+    const handleTrack = async () => {
+        setTrackResult(null);
+
+        const { data, error } = await supabase
+            .from('custom_orders')
+            .select('reference_id,status,created_at,org_name,quantity,lanyard_type')
+            .eq('reference_id', trackId)
+            .maybeSingle();
+
+        if (error) return alert(error.message);
+        if (!data) return alert('Reference ID not found.');
+
+        setTrackResult(data);
     };
 
     return (
@@ -39,21 +104,43 @@ const CustomOrdersPage = () => {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Organization / Name</label>
-                                <input type="text" placeholder="e.g. Mapua University" required />
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Mapua University"
+                                    required
+                                    value={form.org_name}
+                                    onChange={(e) => setForm(f => ({ ...f, org_name: e.target.value }))}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Contact Email</label>
-                                <input type="email" placeholder="you@email.com" required />
+                                <input
+                                    type="email"
+                                    placeholder="you@email.com"
+                                    required
+                                    value={form.contact_email}
+                                    onChange={(e) => setForm(f => ({ ...f, contact_email: e.target.value }))}
+                                />
                             </div>
                         </div>
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Quantity</label>
-                                <input type="number" min="1" placeholder="e.g. 50" required />
+                                <input
+                                    type="number"
+                                    min="1"
+                                    placeholder="e.g. 50"
+                                    required
+                                    value={form.quantity}
+                                    onChange={(e) => setForm(f => ({ ...f, quantity: e.target.value }))}
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Lanyard Type</label>
-                                <select>
+                                <select
+                                    value={form.lanyard_type}
+                                    onChange={(e) => setForm(f => ({ ...f, lanyard_type: e.target.value }))}
+                                >
                                     <option>Full-Color Print</option>
                                     <option>Embroidered Logo</option>
                                     <option>Dye-Sublimation</option>
@@ -63,12 +150,29 @@ const CustomOrdersPage = () => {
                         </div>
                         <div className="form-group">
                             <label>Design Description</label>
-                            <textarea rows="4" placeholder="Describe your design, colors, logo placement, text..." required />
+                            <textarea
+                                rows="4"
+                                placeholder="Describe your design, colors, logo placement, text..."
+                                required
+                                value={form.design_description}
+                                onChange={(e) => setForm(f => ({ ...f, design_description: e.target.value }))}
+                            />
                         </div>
                         <div className="form-group">
                             <label>Reference Files (optional)</label>
-                            <input type="file" accept="image/*,.pdf" />
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                            />
                         </div>
+
+                        {generatedRef && (
+                            <p style={{ textAlign: 'center' }}>
+                                Your Reference ID: <b>{generatedRef}</b>
+                            </p>
+                        )}
+
                         <button
                             type="submit"
                             className={`page__cta-btn${submitted ? ' page__cta-btn--success' : ''}`}
@@ -89,12 +193,26 @@ const CustomOrdersPage = () => {
                                     value={trackId}
                                     onChange={e => setTrackId(e.target.value)}
                                 />
-                                <button className="page__cta-btn" onClick={() => { }}>Track</button>
+                                <button className="page__cta-btn" onClick={handleTrack}>Track</button>
                             </div>
                         </div>
-                        <div className="track-empty">
-                            <p>Enter your reference ID to check the status of your custom order.</p>
-                        </div>
+
+                        {!trackResult && (
+                            <div className="track-empty">
+                                <p>Enter your reference ID to check the status of your custom order.</p>
+                            </div>
+                        )}
+
+                        {trackResult && (
+                            <div className="track-empty">
+                                <p><b>Status:</b> {trackResult.status}</p>
+                                <p><b>Reference ID:</b> {trackResult.reference_id}</p>
+                                <p><b>Organization:</b> {trackResult.org_name}</p>
+                                <p><b>Quantity:</b> {trackResult.quantity}</p>
+                                <p><b>Lanyard Type:</b> {trackResult.lanyard_type}</p>
+                                <p><b>Submitted:</b> {new Date(trackResult.created_at).toLocaleString()}</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

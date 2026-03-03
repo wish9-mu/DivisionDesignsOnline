@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './AuthPage.css';
 import logo from '../assets/DD LOGO.png';
+import { useAuth } from '../context/AuthContext';
 
 const SignInPage = () => {
+    const { signIn } = useAuth();
+    const navigate = useNavigate();
+
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPass, setShowPass] = useState(false);
 
     const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-    const handleSubmit = (e) => { e.preventDefault(); };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const { data, error } = await signIn(form.email, form.password);
+        if (error) return alert(error.message);
+        navigate('/');
+    };
 
     return (
         <div className="auth-split">

@@ -3,14 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import "./AuthPage.css";
 import logo from "../assets/DD LOGO.png";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../supabaseClient";
 
 const SignInPage = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [showPass, setShowPass] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
+
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [showPass, setShowPass] = useState(false);
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -20,14 +23,45 @@ const SignInPage = () => {
     setError("");
     setLoading(true);
 
-    const { error } = await signIn(form.email, form.password);
+    try {
+      const { error: signInErr } = await signIn(form.email, form.password);
 
-    if (error) {
-      setError(error.message);
+      if (signInErr) {
+        setError(signInErr.message || "Sign in failed");
+        return;
+      }
+
+      // Get signed-in user
+      const {
+        data: { user },
+        error: userErr,
+      } = await supabase.auth.getUser();
+
+      if (userErr || !user) {
+        setError(userErr?.message || "Unable to load user session.");
+        return;
+      }
+
+      // Fetch role from profiles (use maybeSingle to avoid crash if missing row)
+      const { data: profile, error: roleErr } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (roleErr) {
+        setError(roleErr.message || "Failed to load user role");
+        return;
+      }
+
+      // Route based on role
+      if (profile?.role === "admin") navigate("/admin");
+      else navigate("/profile");
+    } catch (err) {
+      console.error("Sign in error", err);
+      setError(err?.message || "An unexpected error occurred");
+    } finally {
       setLoading(false);
-    } else {
-      // Successful login - redirect to home or profile
-      navigate("/profile");
     }
   };
 
@@ -37,11 +71,7 @@ const SignInPage = () => {
       <div className="auth-brand">
         <div className="auth-brand__inner">
           <Link to="/" className="auth-brand__logo-wrap">
-            <img
-              src={logo}
-              alt="Division Designs"
-              className="auth-brand__logo"
-            />
+            <img src={logo} alt="Division Designs" className="auth-brand__logo" />
           </Link>
           <h2 className="auth-brand__headline">
             Welcome
@@ -49,8 +79,7 @@ const SignInPage = () => {
             back.
           </h2>
           <p className="auth-brand__body">
-            Sign in to manage your orders, track deliveries, and access
-            exclusive member deals.
+            Sign in to manage your orders, track deliveries, and access exclusive member deals.
           </p>
           <div className="auth-brand__switch">
             <span>Don't have an account?</span>
@@ -90,6 +119,7 @@ const SignInPage = () => {
                   Forgot password?
                 </button>
               </div>
+
               <div className="auth-form__pass-wrap">
                 <input
                   id="password"
@@ -111,11 +141,7 @@ const SignInPage = () => {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="auth-form__submit"
-              disabled={loading}
-            >
+            <button type="submit" className="auth-form__submit" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>

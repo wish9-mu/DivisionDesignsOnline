@@ -1,8 +1,10 @@
+// src/pages/SignUpPage.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthPage.css";
 import logo from "../assets/DD LOGO.png";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../supabaseClient";
 
 const SignUpPage = () => {
   const [form, setForm] = useState({
@@ -33,20 +35,49 @@ const SignUpPage = () => {
 
     setLoading(true);
 
-    const { error } = await signUp(form.email, form.password, {
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+
+    // 1) Create auth user + store metadata
+    const { data, error } = await signUp(form.email, form.password, {
       username: form.username,
       first_name: form.firstName,
       last_name: form.lastName,
-      full_name: `${form.firstName} ${form.lastName}`,
+      full_name: fullName,
     });
 
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else {
-      // Successful signup - show confirmation message or redirect
-      navigate("/profile");
+      return;
     }
+
+    // 2) Upsert into profiles (so Profile page has data immediately)
+    const userId = data?.user?.id;
+
+    if (userId) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: userId,
+            username: form.username,
+            first_name: form.firstName,
+            last_name: form.lastName,
+            full_name: fullName,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "id" }
+        );
+
+      if (profileError) {
+        setError(profileError.message);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // If email confirmation is ON, user may not be verified yet.
+    navigate("/profile");
   };
 
   const passwordsMatch = form.password === form.confirm || form.confirm === "";
@@ -57,11 +88,7 @@ const SignUpPage = () => {
       <div className="auth-brand">
         <div className="auth-brand__inner">
           <Link to="/" className="auth-brand__logo-wrap">
-            <img
-              src={logo}
-              alt="Division Designs"
-              className="auth-brand__logo"
-            />
+            <img src={logo} alt="Division Designs" className="auth-brand__logo" />
           </Link>
           <h2 className="auth-brand__headline">
             Join the
@@ -69,8 +96,7 @@ const SignUpPage = () => {
             Vision.
           </h2>
           <p className="auth-brand__body">
-            Create your account to place custom orders, track deliveries, and
-            get member-exclusive offers.
+            Create your account to place custom orders, track deliveries, and get member-exclusive offers.
           </p>
           <div className="auth-brand__switch">
             <span>Already have an account?</span>
@@ -151,7 +177,7 @@ const SignUpPage = () => {
                 <input
                   id="password"
                   name="password"
-                  type={showPass ? "text" : "password"}
+                  type={showPass ? 'text' : 'password'}
                   placeholder="Minimum 8 characters"
                   value={form.password}
                   onChange={handleChange}
@@ -162,9 +188,9 @@ const SignUpPage = () => {
                 <button
                   type="button"
                   className="auth-form__eye"
-                  onClick={() => setShowPass((v) => !v)}
+                  onClick={() => setShowPass(v => !v)}
                 >
-                  {showPass ? "🙈" : "👁"}
+                  {showPass ? '🙈' : '👁'}
                 </button>
               </div>
             </div>
@@ -174,13 +200,13 @@ const SignUpPage = () => {
               <input
                 id="confirm"
                 name="confirm"
-                type={showPass ? "text" : "password"}
+                type={showPass ? 'text' : 'password'}
                 placeholder="Repeat your password"
                 value={form.confirm}
                 onChange={handleChange}
                 required
                 autoComplete="new-password"
-                className={!passwordsMatch ? "auth-form__input--error" : ""}
+                className={!passwordsMatch ? 'auth-form__input--error' : ''}
               />
               {!passwordsMatch && (
                 <span className="auth-form__error">Passwords do not match</span>
@@ -192,7 +218,7 @@ const SignUpPage = () => {
               className="auth-form__submit"
               disabled={!passwordsMatch || loading}
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? 'Creating…' : 'Create Account'}
             </button>
           </form>
         </div>

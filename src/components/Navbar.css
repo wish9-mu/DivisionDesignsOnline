@@ -226,3 +226,28 @@
     line-height: 1;
     pointer-events: none;
 }
+
+.profile-menu { position: relative; }
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  background: rgb(218, 129, 129);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 10px;
+  min-width: 160px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  overflow: hidden;
+  z-index: 999;
+}
+.profile-dropdown__item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.profile-dropdown__item:hover {
+  background: rgba(0,0,0,0.05);
+}

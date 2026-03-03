@@ -13,6 +13,13 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import AdminPage from "./pages/AdminPage";
 import { CartProvider } from "./context/CartContext";
+import PolicyPage from './pages/PolicyPage';
+import {
+    refundPolicy,
+    privacyPolicy,
+    termsOfService,
+    contactInfo,
+} from './data/policies';
 
 
 function App() {
@@ -31,10 +38,14 @@ function App() {
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/admin" element={<AdminPage />} />
+
+        <Route path="/refund-policy" element={<PolicyPage data={refundPolicy} />} />
+        <Route path="/privacy-policy" element={<PolicyPage data={privacyPolicy} />} />
+        <Route path="/terms-of-service" element={<PolicyPage data={termsOfService} />} />
+        <Route path="/contact" element={<PolicyPage data={contactInfo} type="contact" />} />
       </Routes>
       </CartProvider>
     </AuthProvider>
   );
 }
-
 export default App;

@@ -115,19 +115,6 @@
     letter-spacing: -0.01em;
 }
 
-/* Error banner */
-.auth-form__error-banner {
-    background: #fee;
-    border: 1.5px solid #c0392b;
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    font-size: 0.85rem;
-    color: #c0392b;
-    line-height: 1.5;
-    margin-bottom: 1.2rem;
-    font-weight: 500;
-}
-
 /* ── Form fields ─────────────────────────────────────────────── */
 .auth-form {
     display: flex;

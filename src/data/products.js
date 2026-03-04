@@ -1,0 +1,86 @@
+export const products = [
+  {
+    id: "p1",
+    type: "Standard Lanyards",
+    name: "Classic Black Lanyard",
+    price: 120,
+    tag: "Bestseller",
+    description:
+      "A sleek, all-black lanyard built for everyday use. Durable, minimal, and pairs with any outfit or uniform.",
+    sizes: ['1/2"', '3/4"', '1"'],
+    materials: ["Polyester", "Polycotton"],
+    images: [null, null, null],
+  },
+  {
+    id: "p2",
+    type: "Standard Lanyards",
+    name: "Woven Red Lanyard",
+    price: 150,
+    tag: "New",
+    description:
+      "A vibrant red woven lanyard that stands out in any crowd. Perfect for events and campus wear.",
+    sizes: ['1/2"', '3/4"', '1"'],
+    materials: ["Polyester", "Polycotton"],
+    images: [null, null, null],
+  },
+  {
+    id: "p3",
+    type: "Standard Lanyards",
+    name: "Reversible Reds",
+    price: 210,
+    tag: "Featured",
+    description:
+      "Two looks in one — flip it for a fresh colorway. Our most popular standard lanyard for a reason.",
+    sizes: ['1/2"', '3/4"', '1"'],
+    materials: ["Polyester"],
+    images: [null, null, null],
+  },
+  {
+    id: "p4",
+    type: "Custom Lanyards",
+    name: "Full-Color Print Lanyard",
+    price: 280,
+    tag: "Custom",
+    description:
+      "Go all out with edge-to-edge full-color printing. Upload your design, we handle the rest.",
+    sizes: ['3/4"', '1"'],
+    materials: ["Polyester"],
+    images: [null, null, null],
+  },
+  {
+    id: "p5",
+    type: "Custom Lanyards",
+    name: "Embroidered Logo Lanyard",
+    price: 320,
+    tag: "Custom",
+    description:
+      "Premium embroidered finish for a textured, professional look. Built to last and impress.",
+    sizes: ['3/4"', '1"'],
+    materials: ["Polycotton"],
+    images: [null, null, null],
+  },
+  {
+    id: "p6",
+    type: "Custom Lanyards",
+    name: "Dye-Sublimation Lanyard",
+    price: 350,
+    tag: "Premium",
+    description:
+      "The gold standard. Dye-sublimation delivers rich, fade-resistant colors that won't crack or peel.",
+    sizes: ['1/2"', '3/4"', '1"'],
+    materials: ["Polyester"],
+    images: [null, null, null],
+  },
+  {
+    id: "p7",
+    type: "Custom Lanyards",
+    name: "Aud's Lanyard (TEST)",
+    price: 350,
+    tag: "Premium",
+    description:
+      "The gold standard. Dye-sublimation delivers rich, fade-resistant colors that won't crack or peel.",
+    sizes: ['1/2"', '3/4"', '1"'],
+    materials: ["Polyester"],
+    images: [null, null, null],
+  },
+];

@@ -1,0 +1,664 @@
+/* ── Breadcrumb ────────────────────────────────────────────── */
+.pdp-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  margin-bottom: 2rem;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.pdp-breadcrumb a {
+  color: rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.pdp-breadcrumb a:hover {
+  color: #8e1616;
+}
+
+.pdp-breadcrumb__sep {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+/* ── Not found ─────────────────────────────────────────────── */
+.pdp-not-found {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.pdp-not-found h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.pdp-not-found p {
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0 0 1.5rem;
+}
+
+/* ── Top Section (gallery + info) ──────────────────────────── */
+.pdp-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+/* ── Gallery ───────────────────────────────────────────────── */
+.pdp-gallery__main {
+  margin-bottom: 0.75rem;
+}
+
+.pdp-gallery__main-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #e8c999;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pdp-gallery__tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #8e1616;
+  color: #f8eedf;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.pdp-gallery__thumbs {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.pdp-gallery__thumb {
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  transition: border-color 0.2s;
+}
+
+.pdp-gallery__thumb--active {
+  border-color: #8e1616;
+}
+
+.pdp-gallery__thumb:hover {
+  border-color: rgba(142, 22, 22, 0.4);
+}
+
+.pdp-gallery__thumb-img {
+  width: 100%;
+  height: 100%;
+  background: #e8c999;
+  border-radius: 6px;
+}
+
+/* ── Product Info ──────────────────────────────────────────── */
+.pdp-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdp-info__rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.pdp-info__review-count {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.pdp-info__name {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 900;
+  color: #000;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.pdp-info__meta {
+  margin-bottom: 0.8rem;
+}
+
+.pdp-info__type {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8e1616;
+}
+
+.pdp-info__description {
+  font-size: 0.95rem;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.7;
+  margin: 0 0 1.2rem;
+}
+
+.pdp-info__price {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #000;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Option selectors ──────────────────────────────────────── */
+.pdp-option {
+  margin-bottom: 1.2rem;
+}
+
+.pdp-option__label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 0.5rem;
+}
+
+.pdp-option__chips {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pdp-chip {
+  padding: 0.5rem 1.2rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.pdp-chip:hover {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.pdp-chip--active {
+  border-color: #8e1616;
+  background: rgba(142, 22, 22, 0.06);
+  color: #8e1616;
+}
+
+/* ── Quantity ──────────────────────────────────────────────── */
+.pdp-qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pdp-qty__btn {
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #000;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.pdp-qty__btn:hover {
+  background: #f0f0f0;
+}
+
+.pdp-qty__value {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-size: 0.95rem;
+  color: #000;
+}
+
+/* ── Action Buttons ────────────────────────────────────────── */
+.pdp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.pdp-actions__add {
+  padding: 0.85rem;
+  background: #fff;
+  color: #8e1616;
+  border: 2px solid #8e1616;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.pdp-actions__add:hover {
+  background: rgba(142, 22, 22, 0.06);
+}
+
+.pdp-actions__buy {
+  padding: 0.85rem;
+  background: #8e1616;
+  color: #f8eedf;
+  border: 2px solid #8e1616;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.pdp-actions__buy:hover {
+  background: #a01a1a;
+  border-color: #a01a1a;
+}
+
+/* ── Accordions ────────────────────────────────────────────── */
+.pdp-accordions {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.pdp-accordion {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.pdp-accordion__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 0;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.pdp-accordion__header:hover {
+  color: #8e1616;
+}
+
+.pdp-accordion__icon {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.pdp-accordion__body {
+  padding: 0 0 1.2rem;
+  animation: accordionIn 0.25s ease;
+}
+
+.pdp-accordion__body p {
+  font-size: 0.88rem;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.7;
+  margin: 0 0 0.3rem;
+}
+
+.pdp-accordion__body p:empty {
+  margin: 0.3rem 0;
+}
+
+@keyframes accordionIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Stars ─────────────────────────────────────────────────── */
+.pdp-stars {
+  display: inline-flex;
+  gap: 0.1rem;
+}
+
+.pdp-star {
+  font-size: 1.1rem;
+  color: #d4d4d4;
+  line-height: 1;
+}
+
+.pdp-star--filled {
+  color: #f59e0b;
+}
+
+.pdp-star--interactive {
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.pdp-star--interactive:hover {
+  transform: scale(1.2);
+}
+
+/* ── Reviews Section ───────────────────────────────────────── */
+.pdp-reviews {
+  border-top: 2px solid rgba(0, 0, 0, 0.08);
+  padding-top: 3rem;
+}
+
+.pdp-reviews__title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #000;
+  text-align: center;
+  margin: 0 0 2rem;
+}
+
+/* Summary row */
+.pdp-reviews__summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem 2rem;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+}
+
+.pdp-reviews__avg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+}
+
+.pdp-reviews__avg-num {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #000;
+}
+
+.pdp-reviews__avg-count {
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* Rating bars */
+.pdp-reviews__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pdp-reviews__bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.pdp-reviews__bar-label {
+  font-size: 0.7rem;
+  color: #f59e0b;
+  min-width: 60px;
+  text-align: right;
+  letter-spacing: -0.02em;
+}
+
+.pdp-reviews__bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pdp-reviews__bar-fill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.pdp-reviews__bar-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.4);
+  min-width: 20px;
+}
+
+.pdp-reviews__write-btn {
+  padding: 0.7rem 1.6rem;
+  background: #8e1616;
+  color: #f8eedf;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.pdp-reviews__write-btn:hover {
+  background: #a01a1a;
+}
+
+/* Review list */
+.pdp-reviews__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.pdp-reviews__empty {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 0.9rem;
+  padding: 2rem 0;
+}
+
+/* Review card */
+.pdp-review-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+}
+
+.pdp-review-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.pdp-review-card__header > div {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.pdp-review-card__name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #8e1616;
+}
+
+.pdp-review-card__date {
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.pdp-review-card__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.3rem;
+}
+
+.pdp-review-card__body {
+  font-size: 0.88rem;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Review form */
+.pdp-review-form {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  padding: 1.6rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pdp-review-form__title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0;
+}
+
+.pdp-review-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pdp-review-form__group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.pdp-review-form__group input,
+.pdp-review-form__group textarea {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #000;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.pdp-review-form__group input:focus,
+.pdp-review-form__group textarea:focus {
+  border-color: #8e1616;
+}
+
+.pdp-review-form__submit {
+  padding: 0.75rem;
+  background: #000;
+  color: #f8eedf;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+
+.pdp-review-form__submit:hover:not(:disabled) {
+  background: #8e1616;
+}
+
+.pdp-review-form__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pdp-top {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .pdp-reviews__summary {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .pdp-reviews__avg {
+    margin-bottom: 0.5rem;
+  }
+
+  .pdp-reviews__write-btn {
+    justify-self: center;
+  }
+
+  .pdp-gallery__thumb {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ── Product card links ────────────────────────────────────── */
+.product-card__image-link {
+  display: block;
+  text-decoration: none;
+}
+
+.product-card__name-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.product-card__name-link:hover .product-card__name {
+  color: #8e1616;
+}

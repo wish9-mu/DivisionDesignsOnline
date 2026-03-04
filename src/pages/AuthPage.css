@@ -12,6 +12,33 @@
     align-items: center;
     justify-content: center;
     padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background image (only when --has-bg modifier is present) */
+.auth-brand__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+}
+
+/* Dark overlay for text readability */
+.auth-brand__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1;
+}
+
+/* Ensure text content sits above the image + overlay */
+.auth-brand__inner {
+    position: relative;
+    z-index: 2;
 }
 
 .auth-brand__inner {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthPage.css";
 import logo from "../assets/DD LOGO.png";
+import signinBg from "../assets/signin-bg.png";
 import { useAuth } from "../context/AuthContext";
 
 const SignInPage = () => {
@@ -33,8 +34,10 @@ const SignInPage = () => {
 
   return (
     <div className="auth-split">
-      {/* Left: brand panel */}
-      <div className="auth-brand">
+      {/* Left: brand panel with background image */}
+      <div className="auth-brand auth-brand--has-bg">
+        <img src={signinBg} alt="" className="auth-brand__bg" />
+        <div className="auth-brand__overlay"></div>
         <div className="auth-brand__inner">
           <Link to="/" className="auth-brand__logo-wrap">
             <img

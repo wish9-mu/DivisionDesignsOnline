@@ -1,0 +1,150 @@
+/* BestSellers.css */
+.best-sellers {
+    background: #ffffff;
+    padding: 5rem 2rem;
+}
+
+.best-sellers__inner {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.best-sellers__header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.best-sellers__title {
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    font-weight: 900;
+    color: #000000;
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+}
+
+.best-sellers__subtitle {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.6);
+    margin: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.best-sellers__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+@media (min-width: 1200px) {
+    .best-sellers__grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.best-sellers__card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-decoration: none;
+    display: block;
+}
+
+.best-sellers__card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.best-sellers__card-image {
+    height: 280px;
+    background: #E8C999;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.best-sellers__card-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: #8E1616;
+    color: #F8EEDF;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.best-sellers__card-info {
+    padding: 1.5rem 1.5rem 2rem;
+    text-align: center;
+}
+
+.best-sellers__card-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+.best-sellers__card-price {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #8E1616;
+    margin: 0;
+}
+
+.best-sellers__footer {
+    text-align: center;
+    margin-top: 2.5rem;
+}
+
+.best-sellers__view-all {
+    display: inline-block;
+    padding: 0.9rem 2.8rem;
+    background: #8E1616;
+    color: #F8EEDF;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.best-sellers__view-all:hover {
+    background: #8E1616;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(142, 22, 22, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .best-sellers {
+        padding: 3rem 1.5rem;
+    }
+
+    .best-sellers__grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .best-sellers__card-image {
+        height: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .best-sellers__grid {
+        grid-template-columns: 1fr;
+    }
+}

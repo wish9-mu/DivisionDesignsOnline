@@ -8,6 +8,8 @@ import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
   const isHome = pathname === "/";
@@ -75,8 +77,30 @@ const Navbar = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log("Searching for:", searchQuery);
+    if (searchQuery.trim()) {
+      console.log("Searching for:", searchQuery);
+      setSearchOpen(false);
+    }
   };
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setTimeout(() => searchInputRef.current?.focus(), 50);
+  };
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  };
+
+  // Close search overlay on ESC
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape" && searchOpen) closeSearch();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [searchOpen]);
 
   const handleSignOut = async () => {
     try {
@@ -116,31 +140,26 @@ const Navbar = () => {
       </ul>
 
       <div className="navbar-right">
-        <form className="search-bar" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
-          <button type="submit" className="search-button">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-          </button>
-        </form>
+        <button
+          className="search-icon-btn"
+          onClick={openSearch}
+          aria-label="Open search"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </button>
 
         <button
           className="navbar-cart-btn"
@@ -215,6 +234,68 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Search Overlay */}
+      {searchOpen && (
+        <div className="search-overlay">
+          <div className="search-overlay-header">
+            <form className="search-overlay-form" onSubmit={handleSearch}>
+              <svg
+                className="search-overlay-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-overlay-input"
+              />
+            </form>
+            <button
+              type="button"
+              className="search-overlay-cancel"
+              onClick={closeSearch}
+            >
+              Cancel
+            </button>
+          </div>
+
+          <div className="search-overlay-body">
+            <p className="search-popular-label">Popular Search Terms</p>
+            <div className="search-popular-tags">
+              {["t-shirts", "hoodies", "caps", "stickers", "jackets", "accessories", "new arrivals"].map(
+                (term) => (
+                  <button
+                    key={term}
+                    type="button"
+                    className="search-tag"
+                    onClick={() => {
+                      setSearchQuery(term);
+                      console.log("Searching for:", term);
+                      setSearchOpen(false);
+                    }}
+                  >
+                    {term}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

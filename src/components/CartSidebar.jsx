@@ -57,7 +57,14 @@ const CartSidebar = () => {
                                             <div className="cart-qty">
                                                 <button onClick={() => updateQty(item.id, -1)}>−</button>
                                                 <span>{item.qty}</span>
-                                                <button onClick={() => updateQty(item.id, 1)}>+</button>
+                                                <button
+                                                    onClick={() => updateQty(item.id, 1)}
+                                                    disabled={item.stock !== undefined && item.qty >= item.stock}
+                                                    style={{ opacity: item.stock !== undefined && item.qty >= item.stock ? 0.5 : 1, cursor: item.stock !== undefined && item.qty >= item.stock ? 'not-allowed' : 'pointer' }}
+                                                    title={item.stock !== undefined && item.qty >= item.stock ? 'Max stock reached' : ''}
+                                                >
+                                                    +
+                                                </button>
                                             </div>
                                             <button
                                                 className="cart-item__remove"

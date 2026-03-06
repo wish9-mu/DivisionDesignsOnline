@@ -46,7 +46,7 @@ const ProductDetailPage = () => {
         .select('*')
         .eq('id', productId)
         .single();
-      
+
       if (!error && data) {
         setProduct(data);
       }
@@ -124,8 +124,8 @@ const ProductDetailPage = () => {
   const avgRating =
     reviews.length > 0
       ? (
-          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        ).toFixed(2)
+        reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      ).toFixed(2)
       : 0;
 
   const ratingCounts = [5, 4, 3, 2, 1].map(
@@ -149,7 +149,8 @@ const ProductDetailPage = () => {
           {/* Image Gallery */}
           <div className="pdp-gallery">
             <div className="pdp-gallery__main">
-              <div className="pdp-gallery__main-img">
+              <div className="pdp-gallery__main-img" style={{ overflow: 'hidden', position: 'relative' }}>
+                {product.image_url && <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                 <span className="pdp-gallery__tag">{product.tag}</span>
               </div>
             </div>
@@ -188,6 +189,10 @@ const ProductDetailPage = () => {
 
             <p className="pdp-info__price">₱{Number(product.price).toFixed(2)}</p>
 
+            <p className="pdp-info__stock" style={{ color: product.stock > 0 ? 'green' : 'var(--color-primary-dark)', fontSize: '0.9rem', marginBottom: '1.5rem', fontWeight: '500' }}>
+              {product.stock > 0 ? `${product.stock} items available` : 'Out of Stock'}
+            </p>
+
             {/* Quantity */}
             <div className="pdp-option">
               <label className="pdp-option__label">Quantity</label>
@@ -195,13 +200,15 @@ const ProductDetailPage = () => {
                 <button
                   className="pdp-qty__btn"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  disabled={product.stock <= 0}
                 >
                   −
                 </button>
-                <span className="pdp-qty__value">{qty}</span>
+                <span className="pdp-qty__value">{product.stock <= 0 ? 0 : qty}</span>
                 <button
                   className="pdp-qty__btn"
-                  onClick={() => setQty((q) => q + 1)}
+                  onClick={() => setQty((q) => Math.min(q + 1, product.stock || Infinity))}
+                  disabled={product.stock <= 0 || qty >= (product.stock || Infinity)}
                 >
                   +
                 </button>
@@ -210,11 +217,21 @@ const ProductDetailPage = () => {
 
             {/* Actions */}
             <div className="pdp-actions">
-              <button className="pdp-actions__add" onClick={handleAddToCart}>
-                Add to Cart
+              <button
+                className="pdp-actions__add"
+                onClick={handleAddToCart}
+                disabled={product.stock <= 0}
+                style={{ opacity: product.stock <= 0 ? 0.5 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
+              >
+                {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
               </button>
-              <button className="pdp-actions__buy" onClick={handleAddToCart}>
-                Buy it Now
+              <button
+                className="pdp-actions__buy"
+                onClick={handleAddToCart}
+                disabled={product.stock <= 0}
+                style={{ opacity: product.stock <= 0 ? 0.5 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
+              >
+                {product.stock <= 0 ? 'Out of Stock' : 'Buy it Now'}
               </button>
             </div>
 

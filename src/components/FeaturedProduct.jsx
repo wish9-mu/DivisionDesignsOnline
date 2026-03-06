@@ -26,51 +26,58 @@ const FeaturedProduct = () => {
     };
 
     return (
-        <section className="featured" id="products">
-            <div className="featured__label">Featured Drop</div>
+        <section className="featured-redesign" id="products">
+            <div className="featured-redesign__content">
+                {/* Info (Left) */}
+                <div className="featured-redesign__info">
+                    <h2 className="featured-redesign__name">
+                        Reversible<br />Reds
+                    </h2>
 
-            <div className="featured__card">
-                {/* Image */}
-                <div className="featured__image-wrap">
-                    <img src={hero1} alt="Reversible Reds" className="featured__image" />
-                    <span className="featured__badge">New</span>
-                </div>
+                    <p className="featured-redesign__description">
+                        Enjoy the premium feel of our exclusive reversible lanyards. Featuring high-quality prints and durable materials, it's perfect for campus life or everyday wear. Rep your university with comfort and style.
+                    </p>
 
-                {/* Info */}
-                <div className="featured__info">
-                    <p className="featured__category">Reversible Lanyards</p>
-                    <h2 className="featured__name">Reversible Reds</h2>
-                    <p className="featured__price">₱210.00</p>
+                    <p className="featured-redesign__price">₱210.00</p>
 
-                    <div className="featured__divider" />
+                    <div className="featured-redesign__options">
+                        <div className="featured-redesign__option-group">
+                            <label>Size</label>
+                            <select className="featured-redesign__select" defaultValue="Standard">
+                                <option value="Standard">Standard</option>
+                                <option value="Long">Long</option>
+                            </select>
+                        </div>
 
-                    <p className="featured__qty-label">Qty.</p>
-                    <div className="featured__qty-row">
-                        <div className="featured__qty-control">
-                            <button
-                                className="featured__qty-btn"
-                                onClick={decrease}
-                                aria-label="Decrease quantity"
-                            >
-                                −
-                            </button>
-                            <span className="featured__qty-value">{qty}</span>
-                            <button
-                                className="featured__qty-btn"
-                                onClick={increase}
-                                aria-label="Increase quantity"
-                            >
-                                +
-                            </button>
+                        <div className="featured-redesign__option-group">
+                            <label>Attachment Type</label>
+                            <select className="featured-redesign__select" defaultValue="G-Hook">
+                                <option value="G-Hook">G-Hook</option>
+                                <option value="Trigger Snap">Trigger Snap</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="featured-redesign__qty-group">
+                        <label>Quantity</label>
+                        <div className="featured-redesign__qty-control">
+                            <button className="featured-redesign__qty-btn" onClick={decrease}>−</button>
+                            <span className="featured-redesign__qty-value">{qty}</span>
+                            <button className="featured-redesign__qty-btn" onClick={increase}>+</button>
                         </div>
                     </div>
 
                     <button
-                        className={`featured__cart-btn${added ? ' featured__cart-btn--added' : ''}`}
+                        className={`featured-redesign__cart-btn${added ? ' added' : ''}`}
                         onClick={handleAddToCart}
                     >
-                        {added ? '✓ Added!' : 'Add to Cart'}
+                        {added ? '✓ Added to cart!' : 'Add to cart'}
                     </button>
+                </div>
+
+                {/* Image (Right) */}
+                <div className="featured-redesign__image-wrap">
+                    <img src={hero1} alt="Reversible Reds" className="featured-redesign__image" />
                 </div>
             </div>
         </section>

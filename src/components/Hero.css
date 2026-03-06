@@ -106,30 +106,34 @@
 
 .hero__btn {
     display: inline-block;
-    padding: 11px 28px;
+    padding: 14px 36px;
     border-radius: 9999px;
-    font-size: 0.9rem;
+    /* Pill shape */
+    font-size: 1.05rem;
     font-weight: 600;
     text-decoration: none;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .hero__btn:hover {
-    transform: scale(1.04);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .hero__btn--outline {
-    background: #F8EEDF;
-    color: #000000;
-    border: 2px solid #F8EEDF;
+    background: #F4EBE0;
+    /* Cream background like the image */
+    color: #1A1A1A;
+    /* Dark text */
+    border: none;
 }
 
 .hero__btn--outline:hover {
-    background: #8E1616;
-    color: #F8EEDF;
-    border-color: #8E1616;
+    background: #E8D9C8;
+    /* Slightly darker cream on hover */
+    color: #000000;
 }
 
 .hero__btn--ghost {

@@ -2,80 +2,58 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./BestSellers.css";
+import { supabase } from '../supabaseClient';
 
 const BestSellers = () => {
-  // Filter products with "Bestseller" tag or featured ones
-  const bestSellers = [
-    {
-      id: "p1",
-      name: "Classic Black Lanyard",
-      price: 120,
-      tag: "Bestseller",
-      type: "Standard Lanyards",
-    },
-    {
-      id: "p3",
-      name: "Reversible Reds",
-      price: 210,
-      tag: "Featured",
-      type: "Standard Lanyards",
-    },
-    {
-      id: "p4",
-      name: "Full-Color Print Lanyard",
-      price: 280,
-      tag: "Custom",
-      type: "Custom Lanyards",
-    },
-    {
-      id: "p6",
-      name: "Dye-Sublimation Lanyard",
-      price: 350,
-      tag: "Premium",
-      type: "Custom Lanyards",
-    },
-  ];
+  const [bestSellers, setBestSellers] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchBestSellers = async () => {
+      // Fetch the specific products you want to feature
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .in('tag', ['Bestseller', 'Featured', 'Custom', 'Premium'])
+        .not('image_url', 'is', null)
+        .neq('image_url', '')
+        .limit(3); // Changed to 3 for the new layout
+
+      if (!error && data) {
+        setBestSellers(data);
+      }
+    };
+
+    fetchBestSellers();
+  }, []);
 
   return (
-    <section className="best-sellers">
-      <div className="best-sellers__inner">
-        <div className="best-sellers__header">
-          <h2 className="best-sellers__title">Shop Best Sellers</h2>
-          <p className="best-sellers__subtitle">
-            From corporate events to campus pride, these are what teams and
-            businesses trust most.
-          </p>
-        </div>
+    <section className="best-sellers-banner">
 
-        <div className="best-sellers__grid">
-          {bestSellers.map((product) => (
-            <Link
-              key={product.id}
-              to={`/products/${product.id}`}
-              className="best-sellers__card"
-            >
-              <div className="best-sellers__card-image">
-                {product.tag && (
-                  <span className="best-sellers__card-badge">
-                    {product.tag}
-                  </span>
-                )}
-              </div>
-              <div className="best-sellers__card-info">
-                <h3 className="best-sellers__card-name">{product.name}</h3>
-                <p className="best-sellers__card-price">
-                  From ₱{product.price.toFixed(2)}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
 
-        <div className="best-sellers__footer">
-          <Link to="/products" className="best-sellers__view-all">
-            View all
+      <div className="best-sellers-banner__grid">
+        {bestSellers.map((product) => (
+          <Link
+            key={product.id}
+            to={`/products/${product.id}`}
+            className="best-sellers-banner__card"
+          >
+            <div className="best-sellers-banner__image-container">
+              {product.image_url ? (
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="best-sellers-banner__image"
+                />
+              ) : (
+                <div className="best-sellers-banner__placeholder"></div>
+              )}
+            </div>
+            <div className="best-sellers-banner__overlay">
+              <h3 className="best-sellers-banner__name">{product.name}</h3>
+              <span className="best-sellers-banner__shop-btn">SHOP NOW</span>
+            </div>
           </Link>
-        </div>
+        ))}
       </div>
     </section>
   );

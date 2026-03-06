@@ -29,12 +29,12 @@ const ProductsPage = () => {
                 .from('products')
                 .select('*')
                 .order('created_at', { ascending: true });
-            
+
             if (!error && data && data.length > 0) {
                 setProducts(data);
             }
         };
-        
+
         fetchProducts();
     }, []);
 
@@ -83,21 +83,31 @@ const ProductsPage = () => {
                         // </div>
                         // REPLACE WITH THIS:
                         <Link key={product.id} to={`/products/${product.id}`} className="product-card">
-                            <div className="product-card__image">
+                            <div className="product-card__image" style={{ overflow: 'hidden' }}>
+                                {product.image_url && <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                                 <span className="product-card__tag">{product.tag}</span>
                             </div>
                             <div className="product-card__info">
                                 <p className="product-card__type">{product.type}</p>
                                 <h3 className="product-card__name">{product.name}</h3>
                                 <p className="product-card__price">₱{product.price.toFixed(2)}</p>
+                                {product.stock !== undefined && product.stock <= 0 ? (
+                                    <p className="product-card__out-of-stock" style={{ color: 'var(--color-primary-dark)', fontSize: '0.85rem', marginTop: '0.25rem', fontWeight: '500' }}>Out of Stock</p>
+                                ) : (
+                                    <p className="product-card__in-stock" style={{ color: 'green', fontSize: '0.85rem', marginTop: '0.25rem' }}>{product.stock} items available</p>
+                                )}
                                 <button
                                     className="product-card__btn"
+                                    disabled={product.stock !== undefined && product.stock <= 0}
+                                    style={{ opacity: product.stock !== undefined && product.stock <= 0 ? 0.5 : 1, cursor: product.stock !== undefined && product.stock <= 0 ? 'not-allowed' : 'pointer' }}
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        addItem({ ...product, category: product.type, qty: 1 });
+                                        if (product.stock === undefined || product.stock > 0) {
+                                            addItem({ ...product, category: product.type, qty: 1 });
+                                        }
                                     }}
                                 >
-                                    Add to Cart
+                                    {product.stock !== undefined && product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
                                 </button>
                             </div>
                         </Link>

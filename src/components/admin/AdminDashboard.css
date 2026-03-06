@@ -1,0 +1,79 @@
+/* ── Dashboard Stats ──────────────────────────────────────── */
+.admin__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.admin__stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin__stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.admin__stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.admin__stat-card:nth-child(1)::after {
+    background: #8E1616;
+}
+
+.admin__stat-card:nth-child(2)::after {
+    background: #E8C999;
+}
+
+.admin__stat-card:nth-child(3)::after {
+    background: #1a6b3a;
+}
+
+.admin__stat-card:nth-child(4)::after {
+    background: #2563eb;
+}
+
+.admin__stat-card:nth-child(5)::after {
+    background: #7c3aed;
+}
+
+.admin__stat-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #000;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.admin__stat-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.45);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+@media (max-width: 1024px) {
+    .admin__stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin__stats {
+        grid-template-columns: 1fr;
+    }
+}

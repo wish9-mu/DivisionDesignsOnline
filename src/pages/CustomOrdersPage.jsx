@@ -146,6 +146,7 @@ const CustomOrdersPage = () => {
           quantity: Number(form.quantity),
           lanyard_type: form.lanyard_type,
           design_description: form.design_description,
+          status: "Pending Review",
           file_url,
           appointment_date: formatDate(form.appointment_date),
           appointment_time: form.appointment_time,
@@ -201,9 +202,8 @@ const CustomOrdersPage = () => {
           {["Submit Request", "Track Status"].map((tab) => (
             <button
               key={tab}
-              className={`page__tab${
-                activeTab === tab ? " page__tab--active" : ""
-              }`}
+              className={`page__tab${activeTab === tab ? " page__tab--active" : ""
+                }`}
               onClick={() => setActiveTab(tab)}
             >
               {tab}
@@ -307,39 +307,38 @@ const CustomOrdersPage = () => {
                   className="date-picker-btn"
                   onClick={() => setShowDatePicker(true)}
                 >
-                    {form.appointment_date ? formatDate(form.appointment_date) : "Select Date"}
+                  {form.appointment_date ? formatDate(form.appointment_date) : "Select Date"}
                 </button>
                 {showDatePicker && (
                   <div className="date-picker-popup">
                     <Calendar
                       onChange={handleDateChange}
-                        value={form.appointment_date || new Date()}
+                      value={form.appointment_date || new Date()}
                     />
                   </div>
                 )}
               </div>
               <div className="form-group">
                 <label>Appointment Time</label>
-                  <div className="time-picker">
-                    {!form.appointment_date ? (
-                      <p className="muted">Please select a date first</p>
-                    ) : (
-                      generateTimeSlots()
-                        .filter((time) => !isSlotTaken(time))
-                        .map((time) => (
-                          <button
-                            key={time}
-                            type="button"
-                            className={`time-slot-btn${
-                              form.appointment_time === time ? " time-slot-btn--selected" : ""
+                <div className="time-picker">
+                  {!form.appointment_date ? (
+                    <p className="muted">Please select a date first</p>
+                  ) : (
+                    generateTimeSlots()
+                      .filter((time) => !isSlotTaken(time))
+                      .map((time) => (
+                        <button
+                          key={time}
+                          type="button"
+                          className={`time-slot-btn${form.appointment_time === time ? " time-slot-btn--selected" : ""
                             }`}
-                            onClick={() => handleTimeSelect(time)}
-                          >
-                            {time}
-                          </button>
-                        ))
-                    )}
-                  </div>
+                          onClick={() => handleTimeSelect(time)}
+                        >
+                          {time}
+                        </button>
+                      ))
+                  )}
+                </div>
               </div>
             </div>
 

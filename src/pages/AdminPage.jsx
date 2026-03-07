@@ -29,22 +29,7 @@ const initialOrders = [
     { id: 'ORD-2024-005', customer: 'Rica Lim', email: 'rica@mail.com', items: 'Embroidered Logo ×8', total: 2560, status: 'Processing', date: '2024-12-23' },
 ];
 
-const initialCustomOrders = [
-    { id: 'DD-2024-0012', org: 'Mapua University', email: 'org@mapua.edu', qty: 200, material: 'Polyester', size: '3/4 inch', print: 'Back to Back', status: 'In Progress', date: '2024-12-10' },
-    { id: 'DD-2024-0013', org: 'DLSU Student Council', email: 'sc@dlsu.edu', qty: 150, material: 'Polycotton', size: '1 inch', print: 'One Side', status: 'Pending Review', date: '2024-12-19' },
-    { id: 'DD-2024-0014', org: 'UST Engineering', email: 'eng@ust.edu', qty: 100, material: 'Polyester', size: '1/2 inch', print: 'Back to Back', status: 'Completed', date: '2024-12-05' },
-    { id: 'DD-2024-0015', org: 'Ateneo LS Batch 2025', email: 'batch25@ateneo.edu', qty: 350, material: 'Polycotton', size: '1 inch', print: 'Back to Back', status: 'Pending Review', date: '2024-12-21' },
-];
-
-const initialAppointments = [
-    { id: 'APT-001', customer: 'Maria Santos', email: 'maria@email.com', phone: '+63 917 123 4567', type: 'Design Consultation', date: '2024-12-28', time: '10:00 AM', notes: 'Custom lanyard design for school event', status: 'Confirmed' },
-    { id: 'APT-002', customer: 'Jose Garcia', email: 'jose@email.com', phone: '+63 918 234 5678', type: 'Order Pickup', date: '2024-12-29', time: '2:00 PM', notes: 'Picking up ORD-2024-002', status: 'Scheduled' },
-    { id: 'APT-003', customer: 'DLSU Student Council', email: 'sc@dlsu.edu', phone: '+63 919 345 6789', type: 'Design Consultation', date: '2024-12-30', time: '11:00 AM', notes: 'Bulk order discussion for org lanyards', status: 'Scheduled' },
-    { id: 'APT-004', customer: 'Ana Reyes', email: 'ana@mail.com', phone: '+63 920 456 7890', type: 'Sample Review', date: '2024-12-26', time: '3:30 PM', notes: 'Reviewing sample prints before final order', status: 'Completed' },
-    { id: 'APT-005', customer: 'Ateneo LS Batch 2025', email: 'batch25@ateneo.edu', phone: '+63 921 567 8901', type: 'Design Consultation', date: '2025-01-03', time: '9:00 AM', notes: 'Graduation lanyard design brainstorming', status: 'Scheduled' },
-];
-
-const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Or Refund'];
 const CUSTOM_STATUSES = ['Pending Review', 'In Progress', 'Completed'];
 const APPOINTMENT_STATUSES = ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'];
 
@@ -56,6 +41,13 @@ const NAV_ITEMS = [
     { key: 'appointments', label: 'Appointments' },
 ];
 
+const normalizeStatus = (value) =>
+    (value || '')
+        .toString()
+        .trim()
+        .toLowerCase()
+        .replace(/[_-]+/g, ' ');
+
 const AdminPage = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -63,8 +55,11 @@ const AdminPage = () => {
     const [isSupabaseConnected, setIsSupabaseConnected] = useState(false);
 
     const [orders, setOrders] = useState(initialOrders);
-    const [customOrders, setCustomOrders] = useState(initialCustomOrders);
-    const [appointments, setAppointments] = useState(initialAppointments);
+    const [loadingOrders, setLoadingOrders] = useState(true);
+    const [customOrders, setCustomOrders] = useState([]);
+    const [appointments, setAppointments] = useState([]);
+    const [loadingCustomOrders, setLoadingCustomOrders] = useState(true);
+    const [loadingAppointments, setLoadingAppointments] = useState(true);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -86,25 +81,163 @@ const AdminPage = () => {
         fetchProducts();
     }, []);
 
-    const updateOrderStatus = (id, status) => {
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setLoadingOrders(true);
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                // Keep mock orders as fallback when table is not available.
+                console.error('Error fetching orders:', error.message);
+            } else if (data) {
+                const mappedOrders = data.map((order) => ({
+                    id: order.order_code || order.id,
+                    orderDbId: order.id,
+                    customer: order.customer_name || order.full_name || order.customer || 'N/A',
+                    email: order.customer_email || order.email || 'N/A',
+                    items: order.items_summary || order.items || 'Order items',
+                    total: Number(order.total_amount ?? order.total ?? 0),
+                    status: order.status || 'Pending',
+                    date: order.order_date || (order.created_at ? new Date(order.created_at).toISOString().slice(0, 10) : ''),
+                }));
+                setOrders(mappedOrders);
+            }
+            setLoadingOrders(false);
+        };
+
+        const fetchCustomOrders = async () => {
+            setLoadingCustomOrders(true);
+            const { data, error } = await supabase
+                .from('custom_orders')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching custom orders:', error.message);
+            } else {
+                setCustomOrders(data || []);
+            }
+            setLoadingCustomOrders(false);
+        };
+
+        const fetchAppointments = async () => {
+            setLoadingAppointments(true);
+            const { data, error } = await supabase
+                .from('appointments')
+                .select('*')
+                .order('appointment_date', { ascending: true })
+                .order('appointment_time', { ascending: true });
+
+            if (error) {
+                console.error('Error fetching appointments:', error.message);
+            } else {
+                setAppointments(data || []);
+            }
+            setLoadingAppointments(false);
+        };
+
+        fetchCustomOrders();
+        fetchAppointments();
+        fetchOrders();
+
+        const customOrdersChannel = supabase
+            .channel('admin-custom-orders-changes')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'custom_orders' },
+                () => {
+                    fetchCustomOrders();
+                }
+            )
+            .subscribe();
+
+        const ordersChannel = supabase
+            .channel('admin-orders-changes')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'orders' },
+                () => {
+                    fetchOrders();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(customOrdersChannel);
+            supabase.removeChannel(ordersChannel);
+        };
+    }, []);
+
+    const updateOrderStatus = async (id, status) => {
+        const previousOrders = orders;
         setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+
+        const targetOrder = previousOrders.find((order) => order.id === id);
+        if (!targetOrder?.orderDbId) {
+            return;
+        }
+
+        const { error } = await supabase
+            .from('orders')
+            .update({ status })
+            .eq('id', targetOrder.orderDbId);
+
+        if (error) {
+            setOrders(previousOrders);
+            console.error('Error updating order status:', error.message);
+            alert(`Unable to update order status: ${error.message}`);
+        }
     };
 
-    const updateCustomStatus = (id, status) => {
+    const updateCustomStatus = async (id, status) => {
+        const previousOrders = customOrders;
         setCustomOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+
+        const { error } = await supabase
+            .from('custom_orders')
+            .update({ status })
+            .eq('id', id);
+
+        if (error) {
+            setCustomOrders(previousOrders);
+            console.error('Error updating custom order status:', error.message);
+        }
     };
 
-    const updateAppointmentStatus = (id, status) => {
+    const updateAppointmentStatus = async (id, status) => {
+        const previousAppointments = appointments;
         setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+
+        const { error } = await supabase
+            .from('appointments')
+            .update({ status })
+            .eq('id', id);
+
+        if (error) {
+            setAppointments(previousAppointments);
+            console.error('Error updating appointment status:', error.message);
+        }
     };
 
-    const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
-    const pendingCustom = customOrders.filter(o => o.status === 'Pending Review').length;
+    const totalRevenue = orders
+        .filter((o) => {
+            const status = normalizeStatus(o.status);
+            return status === 'delivered' || status === 'completed';
+        })
+        .reduce((s, o) => s + Number(o.total || 0), 0);
+    const pendingCustom = customOrders.filter((o) => {
+        const status = normalizeStatus(o.status);
+        return status === '' || status === 'pending review' || status === 'pending' || status === 'for review' || status === 'under review';
+    }).length;
     const upcomingAppointments = appointments.filter(a => a.status === 'Scheduled' || a.status === 'Confirmed').length;
 
     const badgeClass = (status) => {
         const map = {
             'Pending': 'pending', 'Processing': 'processing', 'Shipped': 'shipped', 'Delivered': 'delivered',
+            'Return Or Refund': 'review',
             'Pending Review': 'review', 'In Progress': 'in-progress', 'Completed': 'completed',
             'Scheduled': 'scheduled', 'Confirmed': 'confirmed', 'Cancelled': 'cancelled',
             'Bestseller': 'bestseller', 'New': 'new', 'Featured': 'featured', 'Custom': 'custom', 'Premium': 'premium',
@@ -157,6 +290,7 @@ const AdminPage = () => {
                             updateOrderStatus={updateOrderStatus}
                             ORDER_STATUSES={ORDER_STATUSES}
                             badgeClass={badgeClass}
+                            loading={loadingOrders}
                         />
                     )}
 
@@ -165,7 +299,7 @@ const AdminPage = () => {
                             customOrders={customOrders}
                             updateCustomStatus={updateCustomStatus}
                             CUSTOM_STATUSES={CUSTOM_STATUSES}
-                            badgeClass={badgeClass}
+                            loading={loadingCustomOrders}
                         />
                     )}
 
@@ -175,6 +309,7 @@ const AdminPage = () => {
                             updateAppointmentStatus={updateAppointmentStatus}
                             APPOINTMENT_STATUSES={APPOINTMENT_STATUSES}
                             badgeClass={badgeClass}
+                            loading={loadingAppointments}
                         />
                     )}
                 </div>

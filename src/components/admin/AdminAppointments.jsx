@@ -1,30 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import "./AdminDashboard.css";
-import { supabase } from "../../supabaseClient";
 
-const AdminAppointments = ({ updateAppointmentStatus, APPOINTMENT_STATUSES, badgeClass }) => {
-    const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchAppointments = async () => {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from("appointments")
-                .select("*")
-                .order("appointment_date", { ascending: true })
-                .order("appointment_time", { ascending: true });
-
-            if (error) {
-                console.error("Error fetching appointments:", error.message);
-            } else {
-                setAppointments(data);
-            }
-            setLoading(false);
-        };
-
-        fetchAppointments();
-    }, []);
+const AdminAppointments = ({ appointments, updateAppointmentStatus, APPOINTMENT_STATUSES, badgeClass, loading }) => {
 
     if (loading) {
         return <p>Loading appointments...</p>;
@@ -50,7 +27,7 @@ const AdminAppointments = ({ updateAppointmentStatus, APPOINTMENT_STATUSES, badg
                                 <td style={{ color: 'rgba(0,0,0,0.5)' }}>{apt.email}</td>
                                 <td style={{ color: 'rgba(0,0,0,0.5)', whiteSpace: 'nowrap' }}>{apt.phone || "N/A"}</td>
                                 <td>
-                                    <span className={badgeClass(apt.appointment_type)}>
+                                    <span className={badgeClass(apt.appointment_type || 'Scheduled')}>
                                         {apt.appointment_type}
                                     </span>
                                 </td>
@@ -58,7 +35,7 @@ const AdminAppointments = ({ updateAppointmentStatus, APPOINTMENT_STATUSES, badg
                                 <td>{apt.appointment_time}</td>
                                 <td style={{ color: 'rgba(0,0,0,0.55)', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{apt.notes}</td>
                                 <td>
-                                    <select className="admin__status-select" value={apt.status} onChange={e => updateAppointmentStatus(apt.id, e.target.value)}>
+                                    <select className="admin__status-select" value={apt.status || 'Scheduled'} onChange={e => updateAppointmentStatus(apt.id, e.target.value)}>
                                         {APPOINTMENT_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                     </select>
                                 </td>

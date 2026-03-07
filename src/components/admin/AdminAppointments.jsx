@@ -16,7 +16,7 @@ const AdminAppointments = ({ appointments, updateAppointmentStatus, APPOINTMENT_
                     <tbody>
                         {appointments.map(apt => (
                             <tr key={apt.id}>
-                                <td style={{ fontWeight: 600 }}>{apt.id}</td>
+                                <td style={{ fontWeight: 600 }}>{apt.appointment_code ?? apt.id}</td>
                                 <td>{apt.customer}</td>
                                 <td style={{ color: 'rgba(0,0,0,0.5)' }}>{apt.email}</td>
                                 <td style={{ color: 'rgba(0,0,0,0.5)' }}>{apt.phone}</td>

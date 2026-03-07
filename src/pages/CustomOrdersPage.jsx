@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Layout from "../components/Layout";
 import "./PageStyles.css";
 import { supabase } from "../supabaseClient";
+import { useAuth } from "../context/AuthContext";
 
 const CustomOrdersPage = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Submit Request");
   const [trackId, setTrackId] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -52,6 +54,8 @@ const CustomOrdersPage = () => {
         quantity: Number(form.quantity),
         lanyard_type: form.lanyard_type,
         design_description: form.design_description,
+        status: "Pending Review",
+        user_id: user?.id ?? null,
         file_url,
       },
     ]);
@@ -216,7 +220,7 @@ const CustomOrdersPage = () => {
                   type="text"
                   placeholder="e.g. DD-2024-0012"
                   value={trackId}
-                  onChange={(e) => setTrackId(e.target.value)}
+                  onChange={(e) => setTrackId(e.target.value.toUpperCase())}
                 />
                 <button className="page__cta-btn" onClick={handleTrack}>
                   Track

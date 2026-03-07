@@ -1,6 +1,12 @@
 import React from 'react';
 
 const AdminCustomOrders = ({ customOrders, updateCustomStatus, CUSTOM_STATUSES, badgeClass }) => {
+    const formatDate = (value) => {
+        if (!value) return '—';
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString();
+    };
+
     return (
         <>
             <div className="admin__section-header">
@@ -10,25 +16,30 @@ const AdminCustomOrders = ({ customOrders, updateCustomStatus, CUSTOM_STATUSES, 
                 <table className="admin__table">
                     <thead>
                         <tr>
-                            <th>Reference ID</th><th>Organization</th><th>Email</th><th>Qty</th><th>Material</th><th>Size</th><th>Print</th><th>Status</th><th>Date</th>
+                            <th>Reference ID</th><th>Organization</th><th>Email</th><th>Qty</th><th>Type</th><th>File</th><th>Status</th><th>Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {customOrders.map(order => (
-                            <tr key={order.id}>
-                                <td style={{ fontWeight: 600 }}>{order.id}</td>
-                                <td>{order.org}</td>
-                                <td style={{ color: 'rgba(0,0,0,0.5)' }}>{order.email}</td>
-                                <td>{order.qty}</td>
-                                <td>{order.material}</td>
-                                <td>{order.size}</td>
-                                <td>{order.print}</td>
+                            <tr key={order.id ?? order.reference_id}>
+                                <td style={{ fontWeight: 600 }}>{order.reference_id ?? order.id}</td>
+                                <td>{order.org_name ?? order.org}</td>
+                                <td style={{ color: 'rgba(0,0,0,0.5)' }}>{order.contact_email ?? order.email}</td>
+                                <td>{order.quantity ?? order.qty}</td>
+                                <td>{order.lanyard_type ?? order.material ?? '—'}</td>
+                                <td>
+                                    {order.file_url ? (
+                                        <a href={order.file_url} target="_blank" rel="noreferrer">View</a>
+                                    ) : (
+                                        '—'
+                                    )}
+                                </td>
                                 <td>
                                     <select className="admin__status-select" value={order.status} onChange={e => updateCustomStatus(order.id, e.target.value)}>
                                         {CUSTOM_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                     </select>
                                 </td>
-                                <td style={{ color: 'rgba(0,0,0,0.45)' }}>{order.date}</td>
+                                <td style={{ color: 'rgba(0,0,0,0.45)' }}>{formatDate(order.created_at ?? order.date)}</td>
                             </tr>
                         ))}
                     </tbody>

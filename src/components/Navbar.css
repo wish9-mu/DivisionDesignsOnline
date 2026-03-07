@@ -327,3 +327,27 @@
 .profile-dropdown__item:hover {
     background: rgba(0, 0, 0, 0.05);
 }
+
+/* Styling for search results */
+.search-results {
+  margin-top: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.search-result-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  color: black; /* Changed text color to black */
+  cursor: pointer;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}

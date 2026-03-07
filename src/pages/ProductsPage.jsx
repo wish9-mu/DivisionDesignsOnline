@@ -4,15 +4,58 @@ import Layout from '../components/Layout';
 import { useCart } from '../context/CartContext';
 import { supabase } from '../supabaseClient';
 import './PageStyles.css';
+// import noPhoto from "../assets/no-photo.jpg";
 
 // Fallback products if Supabase is not connected
 const fallbackProducts = [
-    { id: 'p1', type: 'Standard Lanyards', name: 'Classic Black Lanyard', price: 120, tag: 'Bestseller' },
-    { id: 'p2', type: 'Standard Lanyards', name: 'Woven Red Lanyard', price: 150, tag: 'New' },
-    { id: 'p3', type: 'Standard Lanyards', name: 'Reversible Reds', price: 210, tag: 'Featured' },
-    { id: 'p4', type: 'Custom Lanyards', name: 'Full-Color Print Lanyard', price: 280, tag: 'Custom' },
-    { id: 'p5', type: 'Custom Lanyards', name: 'Embroidered Logo Lanyard', price: 320, tag: 'Custom' },
-    { id: 'p6', type: 'Custom Lanyards', name: 'Dye-Sublimation Lanyard', price: 350, tag: 'Premium' },
+  {
+    id: "3044a828-eee9-4418-8068-33f57ed1573d",
+    type: "Custom Lanyards",
+    name: "Mapua Baybayin Purple",
+    price: 280,
+    tag: "Custom",
+    stock: 0,
+  },
+  {
+    id: "3a667fe8-892e-4bb2-9a9e-5f4ae580b1f",
+    type: "Standard Lanyards",
+    name: "Mapua Baybayin Red",
+    price: 120,
+    tag: "Bestseller",
+    stock: 74,
+  },
+  {
+    id: "7c185c67-7fcd-41da-8267-8e7db6c5c170",
+    type: "Standard Lanyards",
+    name: "The Original - Comsci",
+    price: 210,
+    tag: "Featured",
+    stock: 32,
+  },
+  {
+    id: "e7892b2d-d675-4c65-9c57-b94d6cb10f4e",
+    type: "Custom Lanyards",
+    name: "The Minimalist",
+    price: 320,
+    tag: "Custom",
+    stock: 0,
+  },
+  {
+    id: "bf104f3b-f8df-4324-85ac-0e820f401b6f",
+    type: "Custom Lanyards",
+    name: "Karudinal - Comsci",
+    price: 350,
+    tag: "Premium",
+    stock: 1,
+  },
+  {
+    id: "72e1fafa-153a-4359-b3c4-054b4c033c9a",
+    type: "Standard Lanyards",
+    name: "The Original Red",
+    price: 150,
+    tag: "Bestseller",
+    stock: 55,
+  }
 ];
 
 const TABS = ['All', 'Standard Lanyards', 'Custom Lanyards'];

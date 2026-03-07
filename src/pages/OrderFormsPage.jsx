@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import './PageStyles.css';
@@ -11,6 +12,7 @@ const OrderFormsPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderComplete, setOrderComplete] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [form, setForm] = useState({
         fullName: '',
@@ -88,6 +90,7 @@ const OrderFormsPage = () => {
                 .from('orders')
                 .insert([
                     {
+                        ...(user?.id ? { user_id: user.id } : {}),
                         order_code: orderCode,
                         customer_name: form.fullName,
                         customer_email: form.email,

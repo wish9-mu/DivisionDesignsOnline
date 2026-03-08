@@ -1,10 +1,11 @@
 // src/pages/SignUpPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthPage.css";
 import logo from "../assets/DD LOGO.png";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
+import gsap from "gsap";
 
 const SignUpPage = () => {
   const [form, setForm] = useState({
@@ -20,6 +21,37 @@ const SignUpPage = () => {
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  const brandRef = useRef(null);
+  const formRef = useRef(null);
+  const logoRef = useRef(null);
+
+  useEffect(() => {
+    let ctx = gsap.context(() => {
+      // Logo entrance
+      gsap.fromTo(logoRef.current,
+        { scale: 0.5, rotation: 15, opacity: 0 },
+        { scale: 1, rotation: 0, opacity: 1, duration: 1.2, ease: "elastic.out(1, 0.5)" }
+      );
+
+      // Stagger brand texts
+      if (brandRef.current) {
+        gsap.fromTo(brandRef.current.children,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out", delay: 0.2 }
+        );
+      }
+
+      // Stagger form elements
+      if (formRef.current) {
+        gsap.fromTo(formRef.current.children,
+          { x: 20, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: "power2.out", delay: 0.4 }
+        );
+      }
+    });
+    return () => ctx.revert();
+  }, []);
 
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -86,9 +118,9 @@ const SignUpPage = () => {
     <div className="auth-split">
       {/* Left: brand panel */}
       <div className="auth-brand">
-        <div className="auth-brand__inner">
+        <div className="auth-brand__inner" ref={brandRef}>
           <Link to="/" className="auth-brand__logo-wrap">
-            <img src={logo} alt="Division Designs" className="auth-brand__logo" />
+            <img src={logo} alt="Division Designs" className="auth-brand__logo" ref={logoRef} />
           </Link>
           <h2 className="auth-brand__headline">
             Join the
@@ -109,7 +141,7 @@ const SignUpPage = () => {
 
       {/* Right: form panel */}
       <div className="auth-form-panel">
-        <div className="auth-form-panel__inner">
+        <div className="auth-form-panel__inner" ref={formRef}>
           <h1 className="auth-form-panel__title">Sign Up</h1>
 
           {error && <div className="auth-form__error-banner">{error}</div>}

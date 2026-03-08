@@ -5,6 +5,8 @@ import "./Navbar.css";
 import logo from "../assets/DD LOGO.png";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
+import { User, LogOut, LogIn } from "lucide-react";
+import gsap from "gsap";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,11 +21,47 @@ const Navbar = () => {
 
   const { user, loading: authLoading, signOut } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const dropdownItemsRef = useRef([]);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Extract initials for the profile badge
+  let userInitials = "DD";
+  if (userName) {
+    const nameParts = userName.trim().split(" ");
+    if (nameParts.length >= 2) {
+      userInitials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+    } else if (nameParts.length === 1 && nameParts[0]) {
+      userInitials = nameParts[0].substring(0, 2).toUpperCase();
+    }
+  } else if (user?.email) {
+    userInitials = user.email.substring(0, 2).toUpperCase();
+  }
+
+  // GSAP Animation for Dropdown
+  useEffect(() => {
+    let ctx;
+    if (menuOpen && dropdownRef.current) {
+      ctx = gsap.context(() => {
+        gsap.fromTo(dropdownRef.current,
+          { opacity: 0, y: -10, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }
+        );
+        if (dropdownItemsRef.current.length > 0) {
+          gsap.fromTo(dropdownItemsRef.current,
+            { opacity: 0, x: -10 },
+            { opacity: 1, x: 0, duration: 0.2, stagger: 0.05, ease: "power2.out", delay: 0.1 }
+          );
+        }
+      });
+    }
+    return () => ctx && ctx.revert();
+  }, [menuOpen]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -54,16 +92,19 @@ const Navbar = () => {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("role")
+          .select("role, full_name, first_name, last_name")
           .eq("id", user.id)
           .maybeSingle();
 
         if (!alive) return;
         if (error) {
-          console.error("role fetch error:", error.message);
+          console.error("role/profile fetch error:", error.message);
           setIsAdmin(false);
         } else {
           setIsAdmin(data?.role === "admin");
+          // Extract name (prioritize full_name, fallback to first/last)
+          const fetchedName = data?.full_name || [data?.first_name, data?.last_name].filter(Boolean).join(" ") || "";
+          setUserName(fetchedName);
         }
       } catch (e) {
         console.error("role fetch failed:", e?.message || e);
@@ -120,13 +161,42 @@ const Navbar = () => {
   }, [searchOpen]);
 
   const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (e) {
-      console.error("Sign out failed", e);
+    // Reverse animation before actually signing out/closing
+    if (dropdownRef.current) {
+      gsap.to(dropdownRef.current, {
+        opacity: 0, y: -10, scale: 0.95, duration: 0.2, ease: "power2.in", onComplete: async () => {
+          try {
+            await signOut();
+          } catch (e) {
+            console.error("Sign out failed", e);
+          }
+          setMenuOpen(false);
+          navigate("/");
+        }
+      });
+    } else {
+      try {
+        await signOut();
+      } catch (e) {
+        console.error("Sign out failed", e);
+      }
+      setMenuOpen(false);
+      navigate("/");
     }
-    setMenuOpen(false);
-    navigate("/");
+  };
+
+  const handleMenuCloseNavigate = (path) => {
+    if (dropdownRef.current) {
+      gsap.to(dropdownRef.current, {
+        opacity: 0, y: -10, scale: 0.95, duration: 0.2, ease: "power2.in", onComplete: () => {
+          setMenuOpen(false);
+          navigate(path);
+        }
+      });
+    } else {
+      setMenuOpen(false);
+      navigate(path);
+    }
   };
 
   const authReady = !authLoading;
@@ -273,43 +343,69 @@ const Navbar = () => {
               authReady ? (user ? "Account menu" : "Sign In") : "Loading"
             }
             onClick={() => setMenuOpen((v) => !v)}
-          />
+          >
+            {authReady && user ? userInitials : ""}
+          </button>
           {menuOpen && (
-            <div className="profile-dropdown">
-              {!authReady ? (
-                <div className="profile-dropdown__item">Loading...</div>
-              ) : !user ? (
-                <button
-                  type="button"
-                  className="profile-dropdown__item"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/sign-in");
-                  }}
-                >
-                  Sign In
-                </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className="profile-dropdown__item"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      navigate("/profile");
-                    }}
-                  >
-                    Profile
-                  </button>
-                  <button
-                    type="button"
-                    className="profile-dropdown__item"
-                    onClick={handleSignOut}
-                  >
-                    Sign Out
-                  </button>
-                </>
+            <div className="profile-dropdown" ref={dropdownRef}>
+              {authReady && user && (
+                <div className="profile-dropdown__header">
+                  <div className="profile-dropdown__avatar">{userInitials}</div>
+                  <div className="profile-dropdown__user-info">
+                    <span className="profile-dropdown__email">{user.email}</span>
+                    <span className="profile-dropdown__role">{isAdmin ? "Admin" : "Student"}</span>
+                  </div>
+                </div>
               )}
+
+              <div className="profile-dropdown__items">
+                {!authReady ? (
+                  <div className="profile-dropdown__item loading">Loading...</div>
+                ) : !user ? (
+                  <button
+                    type="button"
+                    className="profile-dropdown__item"
+                    ref={(el) => (dropdownItemsRef.current[0] = el)}
+                    onClick={() => handleMenuCloseNavigate("/sign-in")}
+                  >
+                    <LogIn size={16} />
+                    <span>Sign In</span>
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="profile-dropdown__item"
+                      ref={(el) => (dropdownItemsRef.current[0] = el)}
+                      onClick={() => handleMenuCloseNavigate("/profile")}
+                    >
+                      <User size={16} />
+                      <span>Profile</span>
+                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className="profile-dropdown__item"
+                        ref={(el) => (dropdownItemsRef.current[1] = el)}
+                        onClick={() => handleMenuCloseNavigate("/admin")}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></svg>
+                        <span>Admin Dashboard</span>
+                      </button>
+                    )}
+                    <div className="profile-dropdown__divider"></div>
+                    <button
+                      type="button"
+                      className="profile-dropdown__item signout"
+                      ref={(el) => (dropdownItemsRef.current[isAdmin ? 2 : 1] = el)}
+                      onClick={handleSignOut}
+                    >
+                      <LogOut size={16} />
+                      <span>Sign Out</span>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>

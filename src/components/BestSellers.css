@@ -8,6 +8,7 @@
     margin-right: -50vw;
     margin-top: 2rem;
     margin-bottom: 2rem;
+    box-sizing: border-box;
 }
 
 .best-sellers-header {

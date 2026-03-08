@@ -13,6 +13,7 @@
     margin-left: -50vw;
     margin-right: -50vw;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 
 .featured-redesign__content {
@@ -199,6 +200,10 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+    .featured-redesign {
+        padding: 4rem 1.5rem;
+    }
+
     .featured-redesign__content {
         flex-direction: column-reverse;
         /* Usually image on top on mobile, then text */

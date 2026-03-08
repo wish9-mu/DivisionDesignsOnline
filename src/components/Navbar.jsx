@@ -22,6 +22,8 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -122,24 +124,57 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <ul className="navbar-links">
-        <li>
-          <Link to="/products">Products</Link>
-        </li>
-        <li>
-          <Link to="/about">About</Link>
-        </li>
-        <li>
-          <Link to="/custom-orders">Custom Orders</Link>
-        </li>
-        {authReady && isAdmin && (
+      <div className={`navbar-links-container ${mobileMenuOpen ? "mobile-open" : ""}`}>
+        <ul className="navbar-links">
           <li>
-            <Link to="/admin">Admin</Link>
+            <Link to="/products" onClick={() => setMobileMenuOpen(false)}>Products</Link>
           </li>
-        )}
-      </ul>
+          <li>
+            <Link to="/about" onClick={() => setMobileMenuOpen(false)}>About</Link>
+          </li>
+          <li>
+            <Link to="/custom-orders" onClick={() => setMobileMenuOpen(false)}>Custom Orders</Link>
+          </li>
+          {authReady && isAdmin && (
+            <li>
+              <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>Admin</Link>
+            </li>
+          )}
+        </ul>
+      </div>
 
       <div className="navbar-right">
+        <button
+          className="hamburger-btn"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle mobile menu"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {mobileMenuOpen ? (
+              <>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </>
+            ) : (
+              <>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </>
+            )}
+          </svg>
+        </button>
+
         <button
           className="search-icon-btn"
           onClick={openSearch}

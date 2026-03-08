@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import AdminPage from "./pages/AdminPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { CartProvider } from "./context/CartContext";
 import PolicyPage from './pages/PolicyPage';
 import {
@@ -41,6 +42,7 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/refund-policy" element={<PolicyPage data={refundPolicy} />} />
         <Route path="/privacy-policy" element={<PolicyPage data={privacyPolicy} />} />
         <Route path="/terms-of-service" element={<PolicyPage data={termsOfService} />} />

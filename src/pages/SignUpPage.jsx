@@ -18,6 +18,9 @@ const SignUpPage = () => {
   });
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
+  const [duplicateMessage, setDuplicateMessage] = useState("");
+  const [usernameTaken, setUsernameTaken] = useState(false);
+  const [emailTaken, setEmailTaken] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -53,12 +56,19 @@ const SignUpPage = () => {
     return () => ctx.revert();
   }, []);
 
-  const handleChange = (e) =>
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name } = e.target;
+    if (name === "username") setUsernameTaken(false);
+    if (name === "email") setEmailTaken(false);
+    setForm((f) => ({ ...f, [name]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setDuplicateMessage("");
+    setUsernameTaken(false);
+    setEmailTaken(false);
 
     if (form.password !== form.confirm) {
       setError("Passwords do not match");
@@ -69,6 +79,26 @@ const SignUpPage = () => {
 
     const fullName = `${form.firstName} ${form.lastName}`.trim();
 
+    // 0) Check username uniqueness in profiles (case-insensitive)
+    const usernameToCheck = form.username.trim();
+    const { data: existingUsername, error: usernameCheckError } = await supabase
+      .from("profiles")
+      .select("id")
+      .ilike("username", usernameToCheck)
+      .limit(1);
+
+    if (usernameCheckError) {
+      setError(usernameCheckError.message);
+      setLoading(false);
+      return;
+    }
+
+    if (existingUsername && existingUsername.length > 0) {
+      setUsernameTaken(true);
+      setLoading(false);
+      return;
+    }
+
     // 1) Create auth user + store metadata
     const { data, error } = await signUp(form.email, form.password, {
       username: form.username,
@@ -78,7 +108,13 @@ const SignUpPage = () => {
     });
 
     if (error) {
-      setError(error.message);
+      const msg = error.message || "";
+      const lower = msg.toLowerCase();
+      if (lower.includes("already") || lower.includes("registered") || lower.includes("duplicate") || lower.includes("taken")) {
+        setEmailTaken(true);
+      } else {
+        setError(msg);
+      }
       setLoading(false);
       return;
     }
@@ -91,8 +127,8 @@ const SignUpPage = () => {
         .from("profiles")
         .upsert(
           {
-            id: userId,
-            username: form.username,
+          id: userId,
+          username: form.username,
             first_name: form.firstName,
             last_name: form.lastName,
             full_name: fullName,
@@ -159,6 +195,9 @@ const SignUpPage = () => {
                 required
                 autoComplete="username"
               />
+              {usernameTaken && (
+                <span className="auth-form__error">Username is already taken</span>
+              )}
             </div>
 
             <div className="auth-form__group">
@@ -201,6 +240,9 @@ const SignUpPage = () => {
                 required
                 autoComplete="email"
               />
+              {emailTaken && (
+                <span className="auth-form__error">Email is already taken</span>
+              )}
             </div>
 
             <div className="auth-form__group">
@@ -252,6 +294,11 @@ const SignUpPage = () => {
             >
               {loading ? 'Creating…' : 'Create Account'}
             </button>
+            {duplicateMessage && (
+              <div className="auth-form__error-banner" style={{ marginTop: 12 }}>
+                {duplicateMessage}
+              </div>
+            )}
           </form>
         </div>
       </div>

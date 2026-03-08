@@ -66,14 +66,108 @@
     letter-spacing: 0.06em;
 }
 
+/* ── Charts Grid ─────────────────────────────────────────── */
+.admin__charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin__chart-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.admin__chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+.admin__chart-card--wide {
+    grid-column: span 2;
+}
+
+.admin__chart-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 1.2rem 0;
+    letter-spacing: -0.01em;
+}
+
+.admin__chart-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.admin__chart-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: rgba(0, 0, 0, 0.3);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.015);
+    border-radius: 12px;
+    border: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+/* ── Custom Tooltip ──────────────────────────────────────── */
+.admin__chart-tooltip {
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-size: 0.82rem;
+}
+
+.admin__chart-tooltip-label {
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.25rem;
+}
+
+.admin__chart-tooltip p {
+    margin: 0.15rem 0;
+    font-weight: 500;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1024px) {
     .admin__stats {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .admin__charts {
+        grid-template-columns: 1fr;
+    }
+
+    .admin__chart-card--wide {
+        grid-column: span 1;
     }
 }
 
 @media (max-width: 768px) {
     .admin__stats {
+        grid-template-columns: 1fr;
+    }
+
+    .admin__charts {
         grid-template-columns: 1fr;
     }
 }

@@ -76,6 +76,27 @@ By default, Supabase requires email confirmation. Users will receive a confirmat
 2. Turn off "Enable email confirmations"
 3. Save changes
 
+## Step 8: Deploy Edge Functions (for Paymongo Integration)
+
+Our checkout system integrates with Paymongo securely via Supabase Edge Functions. To ensure this works in production:
+
+1. Install Supabase CLI: `npm i -g supabase` or run commands via `npx supabase`.
+2. Link your local project to your remote Supabase instance:
+   ```bash
+   npx supabase link --project-ref your-project-ref
+   ```
+3. Set your Paymongo Secret Key in your Supabase project's vault:
+   ```bash
+   npx supabase secrets set PAYMONGO_SECRET_KEY=sk_test_...
+   ```
+4. Deploy the functions:
+   ```bash
+   npx supabase functions deploy create-paymongo-checkout
+   npx supabase functions deploy paymongo-webhook
+   ```
+5. In your Paymongo Dashboard, add a Webhook for `checkout_session.payment.paid` pointing to your deployed webhook URL:
+   `https://<your-project-ref>.supabase.co/functions/v1/paymongo-webhook`
+
 ## Troubleshooting
 
 ### "Invalid API key" error

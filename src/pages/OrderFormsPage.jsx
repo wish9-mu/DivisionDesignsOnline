@@ -19,7 +19,7 @@ const OrderFormsPage = () => {
         email: '',
         address: '',
         contact: '',
-        paymentMethod: 'GCash'
+        paymentMethod: 'Paymongo'
     });
 
     const isUuid = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
@@ -96,6 +96,7 @@ const OrderFormsPage = () => {
                         customer_email: form.email,
                         contact_number: form.contact,
                         shipping_address: form.address,
+                        // If Paymongo, set initially as 'Pending' or wait for webhook
                         payment_method: form.paymentMethod,
                         items_summary: itemsSummary,
                         total_amount: Number(total),
@@ -107,15 +108,59 @@ const OrderFormsPage = () => {
 
             if (orderInsertError) throw orderInsertError;
 
+            if (form.paymentMethod === 'Paymongo') {
+                // Call Supabase Edge Function to create Paymongo Checkout
+                const { data, error } = await supabase.functions.invoke('create-paymongo-checkout', {
+                    headers: {
+                        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                    },
+                    body: {
+                        order_code: orderCode,
+                        amount: Number(total),
+                        line_items: items,
+                        customer_name: form.fullName,
+                        customer_email: form.email,
+                        success_url: `${window.location.origin}/order-forms?success=true`,
+                        cancel_url: `${window.location.origin}/order-forms?cancel=true`
+                    }
+                });
+
+                if (error) {
+                    console.error("Edge Function error: ", error);
+                    throw new Error("Payment gateway error. Please try again.");
+                }
+
+                if (data?.checkout_url) {
+                    clearCart();
+                    window.location.href = data.checkout_url;
+                    return; // Prevent further execution
+                } else {
+                    throw new Error("Failed to get checkout URL from payment gateway.");
+                }
+            }
+
             clearCart();
             setOrderComplete(true);
         } catch (error) {
             console.error("Checkout failed:", error);
-            alert("There was an error processing your checkout. Please try again.");
+            alert(`There was an error processing your checkout: ${error.message || error}`);
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    // Handle successful redirection back from Paymongo
+    React.useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.get('success') === 'true') {
+            setOrderComplete(true);
+            // Optionally, remove the query parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (queryParams.get('cancel') === 'true') {
+            alert('Payment was cancelled or failed.');
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, []);
 
     if (orderComplete) {
         return (
@@ -125,7 +170,7 @@ const OrderFormsPage = () => {
                         <p className="page__eyebrow">Success</p>
                         <h1 className="page__title">Order Complete!</h1>
                         <p className="page__subtitle" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                            Thank you for your purchase, {form.fullName}! We have successfully received your order and updated our inventory.
+                            Thank you for your purchase, {form.fullName || 'Valued Customer'}! We have successfully received your order and updated our inventory.
                         </p>
                         <button
                             className="page__cta-btn"
@@ -258,9 +303,9 @@ const OrderFormsPage = () => {
                                         value={form.paymentMethod}
                                         onChange={e => setForm({ ...form, paymentMethod: e.target.value })}
                                     >
-                                        <option>GCash</option>
-                                        <option>Bank Transfer</option>
-                                        <option>Cash on Delivery</option>
+                                        <option value="Paymongo">Paymongo (GCash, GrabPay, QRPh, Card)</option>
+                                        <option value="Bank Transfer">Bank Transfer</option>
+                                        <option value="Cash on Delivery">Cash on Delivery</option>
                                     </select>
                                 </div>
                             </div>

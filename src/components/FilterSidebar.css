@@ -1,0 +1,188 @@
+/* ── keyframes ─────────────────────────────────────────────── */
+@keyframes filterSlideIn {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Sidebar panel ─────────────────────────────────────────── */
+.shop-sidebar {
+    width: 220px;
+    min-width: 220px;
+    flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+    animation: filterSlideIn 0.35s ease;
+    transition: width 0.35s ease, min-width 0.35s ease, opacity 0.35s ease, margin 0.35s ease, padding 0.35s ease;
+    /* Panel */
+    background: rgba(250, 248, 245, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 18px;
+    padding: 1.3rem 1.1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+.shop-sidebar::-webkit-scrollbar { width: 4px; }
+.shop-sidebar::-webkit-scrollbar-track { background: transparent; }
+.shop-sidebar::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 999px; }
+
+.shop-sidebar--hidden {
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-right: -1.5rem;
+    padding: 0;
+    border-width: 0;
+    pointer-events: none;
+}
+
+/* ── Sidebar header ─────────────────────────────────────────── */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-header__dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #8E1616;
+    flex-shrink: 0;
+}
+
+.sidebar-header__label {
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.42);
+}
+
+/* ── Filter group ──────────────────────────────────────────── */
+.filter-group {
+    margin-bottom: 0.4rem;
+}
+
+.filter-group__title {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.38);
+    margin: 0 0 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.filter-group__title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #8E1616;
+    flex-shrink: 0;
+}
+
+/* ── Filter list ───────────────────────────────────────────── */
+.filter-group__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+/* ── Pill chips ─────────────────────────────────────────────── */
+.filter-group__item {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.58);
+    padding: 0.3rem 0.9rem;
+    border: 1.5px solid rgba(0, 0, 0, 0.13);
+    border-radius: 999px;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.22s ease;
+    user-select: none;
+    line-height: 1.6;
+}
+
+.filter-group__item:hover {
+    border-color: rgba(0, 0, 0, 0.3);
+    color: #000;
+    transform: translateY(-1px);
+}
+
+.filter-group__item--active {
+    background: #8E1616;
+    border-color: #8E1616;
+    color: #F8EEDF;
+    font-weight: 700;
+}
+
+.filter-group__item--active:hover {
+    background: #a01a1a;
+    border-color: #a01a1a;
+    color: #F8EEDF;
+    transform: translateY(-1px);
+}
+
+/* ── Divider ───────────────────────────────────────────────── */
+.filter-group__divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+    margin: 1rem 0;
+    border: none;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .shop-sidebar {
+        width: 190px;
+        min-width: 190px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* On mobile the sidebar stacks vertically — switch to max-height collapse */
+    .shop-sidebar {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto;
+        max-height: 600px;
+        overflow: hidden;
+        border-radius: 14px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        /* override desktop width transition with max-height transition */
+        transition: max-height 0.38s ease, opacity 0.3s ease,
+                    padding 0.3s ease, margin 0.3s ease, border-width 0.3s ease;
+    }
+
+    .shop-sidebar--hidden {
+        max-height: 0 !important;
+        opacity: 0;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-width: 0 !important;
+        pointer-events: none;
+        /* cancel the desktop width:0 rule */
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .filter-group__list {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}

@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Layout from '../components/Layout';
-import { useCart } from '../context/CartContext';
-import { supabase } from '../supabaseClient';
-import './PageStyles.css';
-// import noPhoto from "../assets/no-photo.jpg";
+import React, { useState, useEffect, useMemo } from "react";
+import Layout from "../components/Layout";
+import { useCart } from "../context/CartContext";
+import { supabase } from "../supabaseClient";
+import FilterSidebar from "../components/FilterSidebar";
+import ShopCard from "../components/ShopCard";
+import "./PageStyles.css";
 
-// Fallback products if Supabase is not connected
 const fallbackProducts = [
   {
     id: "3044a828-eee9-4418-8068-33f57ed1573d",
@@ -55,110 +54,179 @@ const fallbackProducts = [
     price: 150,
     tag: "Bestseller",
     stock: 55,
-  }
+  },
 ];
 
-const TABS = ['All', 'Standard Lanyards', 'Custom Lanyards'];
+const SORT_OPTIONS = [
+  { label: "Newest",          value: "newest"    },
+  { label: "Price: Low–High", value: "price-asc" },
+  { label: "Price: High–Low", value: "price-desc" },
+  { label: "Name: A–Z",       value: "name-asc"  },
+];
+
+const CATEGORIES  = ["All", "Standard Lanyards", "Custom Lanyards"];
+const TAGS        = ["All", "Premium", "Custom", "Bestseller", "Featured"];
+const AVAILABILITY = ["All", "In Stock", "Out of Stock"];
 
 const ProductsPage = () => {
-    const [activeTab, setActiveTab] = useState('All');
-    const [products, setProducts] = useState(fallbackProducts);
-    const { addItem } = useCart();
+  const [products,           setProducts]           = useState(fallbackProducts);
+  const [activeCategory,     setActiveCategory]     = useState("All");
+  const [activeTag,          setActiveTag]          = useState("All");
+  const [activeAvailability, setActiveAvailability] = useState("All");
+  const [sortBy,             setSortBy]             = useState("newest");
+  const [sortOpen,           setSortOpen]           = useState(false);
+  const [filtersVisible,     setFiltersVisible]     = useState(true);
+  const { addItem } = useCart();
 
-    // Fetch products from Supabase on load
-    useEffect(() => {
-        const fetchProducts = async () => {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .order('created_at', { ascending: true });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: true });
 
-            if (!error && data && data.length > 0) {
-                setProducts(data);
-            }
-        };
+      if (!error && data && data.length > 0) {
+        setProducts(data);
+      }
+    };
+    fetchProducts();
+  }, []);
 
-        fetchProducts();
-    }, []);
+  const filtered = useMemo(() => {
+    let result = [...products];
 
-    const filtered = activeTab === 'All'
-        ? products
-        : products.filter(p => p.type === activeTab);
+    if (activeCategory !== "All")
+      result = result.filter((p) => p.type === activeCategory);
+    if (activeTag !== "All")
+      result = result.filter((p) => p.tag === activeTag);
+    if (activeAvailability === "In Stock")
+      result = result.filter((p) => p.stock > 0);
+    else if (activeAvailability === "Out of Stock")
+      result = result.filter((p) => p.stock !== undefined && p.stock <= 0);
 
-    return (
-        <Layout>
-            <div className="page">
-                <div className="page__header">
-                    <p className="page__eyebrow">Shop</p>
-                    <h1 className="page__title">Our Products</h1>
-                    <p className="page__subtitle">Crafted to represent your brand with pride.</p>
-                </div>
+    switch (sortBy) {
+      case "price-asc":  result.sort((a, b) => a.price - b.price);               break;
+      case "price-desc": result.sort((a, b) => b.price - a.price);               break;
+      case "name-asc":   result.sort((a, b) => a.name.localeCompare(b.name));    break;
+      default: break;
+    }
 
-                <div className="page__tabs">
-                    {TABS.map(tab => (
-                        <button
-                            key={tab}
-                            className={`page__tab${activeTab === tab ? ' page__tab--active' : ''}`}
-                            onClick={() => setActiveTab(tab)}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
+    return result;
+  }, [products, activeCategory, activeTag, activeAvailability, sortBy]);
 
-                <div className="products__grid">
-                    {filtered.map(product => (
-                        // <div key={product.id} className="product-card">
-                        //     <div className="product-card__image">
-                        //         <span className="product-card__tag">{product.tag}</span>
-                        //     </div>
-                        //     <div className="product-card__info">
-                        //         <p className="product-card__type">{product.type}</p>
-                        //         <h3 className="product-card__name">{product.name}</h3>
-                        //         <p className="product-card__price">₱{product.price.toFixed(2)}</p>
-                        //         <button
-                        //             className="product-card__btn"
-                        //             onClick={() => addItem({ ...product, category: product.type, qty: 1 })}
-                        //         >
-                        //             Add to Cart
-                        //         </button>
-                        //     </div>
-                        // </div>
-                        // REPLACE WITH THIS:
-                        <Link key={product.id} to={`/products/${product.id}`} className="product-card">
-                            <div className="product-card__image" style={{ overflow: 'hidden' }}>
-                                {product.image_url && <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                                <span className="product-card__tag">{product.tag}</span>
-                            </div>
-                            <div className="product-card__info">
-                                <p className="product-card__type">{product.type}</p>
-                                <h3 className="product-card__name">{product.name}</h3>
-                                <p className="product-card__price">₱{product.price.toFixed(2)}</p>
-                                {product.stock !== undefined && product.stock <= 0 ? (
-                                    <p className="product-card__out-of-stock" style={{ color: 'var(--color-primary-dark)', fontSize: '0.85rem', marginTop: '0.25rem', fontWeight: '500' }}>Out of Stock</p>
-                                ) : (
-                                    <p className="product-card__in-stock" style={{ color: 'green', fontSize: '0.85rem', marginTop: '0.25rem' }}>{product.stock} items available</p>
-                                )}
-                                <button
-                                    className="product-card__btn"
-                                    disabled={product.stock !== undefined && product.stock <= 0}
-                                    style={{ opacity: product.stock !== undefined && product.stock <= 0 ? 0.5 : 1, cursor: product.stock !== undefined && product.stock <= 0 ? 'not-allowed' : 'pointer' }}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (product.stock === undefined || product.stock > 0) {
-                                            addItem({ ...product, category: product.type, qty: 1 });
-                                        }
-                                    }}
-                                >
-                                    {product.stock !== undefined && product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
-                                </button>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+  const currentSortLabel =
+    SORT_OPTIONS.find((o) => o.value === sortBy)?.label ?? "Sort By";
+
+  const handleAddToCart = (product) => {
+    addItem({
+      ...product,
+      image: product.image_url,
+      category: product.type,
+      qty: 1,
+    });
+  };
+
+  return (
+    <Layout>
+      <div className="shop-page">
+
+        {/* ── Top bar ─────────────────────────────── */}
+        <div className="shop-topbar">
+          <h1 className="shop-topbar__title">
+            {activeCategory === "All" ? "All Products" : activeCategory}
+            <span className="shop-topbar__count">({filtered.length})</span>
+          </h1>
+
+          <div className="shop-topbar__actions">
+            {/* Filter toggle */}
+            <button
+              className="shop-topbar__toggle"
+              onClick={() => setFiltersVisible((v) => !v)}
+            >
+              {filtersVisible ? "Hide Filters" : "Show Filters"}
+              <svg
+                width="18" height="18" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor"
+                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              >
+                <line x1="4"  y1="6"  x2="20" y2="6"  />
+                <line x1="4"  y1="12" x2="14" y2="12" />
+                <line x1="4"  y1="18" x2="10" y2="18" />
+              </svg>
+            </button>
+
+            {/* Sort dropdown */}
+            <div className="shop-sort">
+              <button
+                className="shop-sort__btn"
+                onClick={() => setSortOpen((v) => !v)}
+              >
+                Sort By: {currentSortLabel}
+                <svg
+                  className={`shop-sort__chevron${sortOpen ? " shop-sort__chevron--open" : ""}`}
+                  width="14" height="14" viewBox="0 0 24 24"
+                  fill="none" stroke="currentColor"
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {sortOpen && (
+                <ul className="shop-sort__dropdown">
+                  {SORT_OPTIONS.map((opt) => (
+                    <li
+                      key={opt.value}
+                      className={`shop-sort__option${sortBy === opt.value ? " shop-sort__option--active" : ""}`}
+                      onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                    >
+                      {opt.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-        </Layout>
-    );
+          </div>
+        </div>
+
+        {/* ── Body: sidebar + grid ────────────────── */}
+        <div className="shop-body">
+
+          {/* Filter sidebar */}
+          <FilterSidebar
+            visible={filtersVisible}
+            categories={CATEGORIES}
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+            tags={TAGS}
+            activeTag={activeTag}
+            onTagChange={setActiveTag}
+            availability={AVAILABILITY}
+            activeAvailability={activeAvailability}
+            onAvailabilityChange={setActiveAvailability}
+          />
+
+          {/* Product grid */}
+          <section className="shop-grid-wrapper">
+            {filtered.length === 0 && (
+              <p className="shop-empty">No products match your filters.</p>
+            )}
+            <div className={`shop-grid${filtersVisible ? "" : " shop-grid--full"}`}>
+              {filtered.map((product, i) => (
+                <ShopCard
+                  key={product.id}
+                  product={product}
+                  index={i}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
+            </div>
+          </section>
+        </div>
+
+      </div>
+    </Layout>
+  );
 };
 
 export default ProductsPage;

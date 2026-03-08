@@ -1,0 +1,76 @@
+.ticker-section {
+    position: relative;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    height: 300px;
+    /* Adjust height based on how much space the diagonals take */
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -2rem;
+    /* Pull up slightly to overlap section below/above if needed */
+    z-index: 10;
+}
+
+.ticker-wrapper {
+    position: absolute;
+    width: 120vw;
+    /* Wider than screen to prevent edge cutoffs during rotation */
+    height: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ticker-track-container {
+    position: absolute;
+    width: 200%;
+    /* Double width for smooth infinite scrolling */
+    display: flex;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    /* Lanyards are physical items, give them depth */
+}
+
+/* Base style for the track itself that animates */
+.ticker-track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+}
+
+/* The actual lanyard images */
+.ticker-img {
+    height: 60px;
+    /* Adjust thickness of lanyard */
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Angles and layer ordering for overlap */
+.track-black {
+    transform: rotate(-5deg);
+    z-index: 1;
+}
+
+.track-red {
+    transform: rotate(3deg);
+    z-index: 2;
+    /* Red overlaps black */
+}
+
+@media (max-width: 768px) {
+    .ticker-section {
+        height: 200px;
+    }
+
+    .ticker-img {
+        height: 40px;
+    }
+}

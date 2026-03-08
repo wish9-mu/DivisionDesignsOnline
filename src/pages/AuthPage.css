@@ -150,6 +150,16 @@
     box-sizing: border-box;
 }
 
+/* Force override of Chrome's default autofill styling (blue/yellow background) */
+.auth-form__group input:-webkit-autofill,
+.auth-form__group input:-webkit-autofill:hover,
+.auth-form__group input:-webkit-autofill:focus,
+.auth-form__group input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #fafafa inset !important;
+    -webkit-text-fill-color: #000 !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .auth-form__group input:focus {
     border-color: #8E1616;
     box-shadow: 0 0 0 3px rgba(142, 22, 22, 0.1);

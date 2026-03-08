@@ -1,3 +1,4 @@
+/* OLD CSS */
 /* ── Page Shell ────────────────────────────────────────────── */
 .page {
     padding: 2rem 0 4rem;
@@ -73,21 +74,23 @@
     background: #000000;
     color: #F8EEDF;
     border: 1.5px solid #000000;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    border-radius: 30px;
+    font-size: 0.88rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.25s, color 0.25s, transform 0.15s;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.18s ease, box-shadow 0.25s ease;
     margin-top: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
 }
 
 .page__cta-btn:hover {
     background: #8E1616;
     border-color: #8E1616;
     color: #F8EEDF;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(142, 22, 22, 0.25);
 }
 
 .page__cta-btn--success {
@@ -612,4 +615,216 @@
 
 .react-calendar__month-view__days__day--weekend {
   color: black; /* Changed weekend dates to black */
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SHOP PAGE 
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── keyframes ─────────────────────────────────────────────── */
+@keyframes dropIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── page wrapper ──────────────────────────────────────────── */
+.shop-page {
+    padding: 1.5rem 0 4rem;
+    min-height: 70vh;
+}
+
+/* ── top bar ───────────────────────────────────────────────── */
+.shop-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.shop-topbar__title {
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    font-weight: 800;
+    color: #000;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.shop-topbar__count {
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.45);
+    margin-left: 0.35rem;
+}
+
+.shop-topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.shop-topbar__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: none;
+    border: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    padding: 0.4rem 0;
+    transition: color 0.2s;
+}
+
+.shop-topbar__toggle:hover {
+    color: #8e1616;
+}
+
+/* ── sort dropdown ─────────────────────────────────────────── */
+.shop-sort {
+    position: relative;
+}
+
+.shop-sort__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: none;
+    border: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    padding: 0.4rem 0;
+    transition: color 0.2s;
+}
+
+.shop-sort__btn:hover {
+    color: #8e1616;
+}
+
+.shop-sort__chevron {
+    transition: transform 0.25s ease;
+}
+
+.shop-sort__chevron--open {
+    transform: rotate(180deg);
+}
+
+.shop-sort__dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 0;
+    min-width: 180px;
+    z-index: 50;
+    animation: dropIn 0.2s ease;
+}
+
+.shop-sort__option {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.shop-sort__option:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #000;
+}
+
+.shop-sort__option--active {
+    color: #8e1616;
+    font-weight: 700;
+}
+
+/* ── body layout ───────────────────────────────────────────── */
+.shop-body {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    height: calc(100vh - 180px);
+    overflow: hidden;
+}
+
+/* ── grid scroll area ──────────────────────────────────────── */
+.shop-grid-wrapper {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+.shop-grid-wrapper::-webkit-scrollbar { width: 5px; }
+.shop-grid-wrapper::-webkit-scrollbar-track { background: transparent; }
+.shop-grid-wrapper::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 999px; }
+.shop-grid-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
+
+.shop-empty {
+    text-align: center;
+    color: rgba(0, 0, 0, 0.4);
+    font-size: 0.95rem;
+    padding: 4rem 1rem;
+}
+
+/* ── product grid ──────────────────────────────────────────── */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem 0.75rem;
+}
+
+.shop-grid--full {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* ── responsive ────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .shop-grid     { grid-template-columns: repeat(2, 1fr); }
+    .shop-grid--full { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .shop-body {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+    }
+
+    .shop-grid-wrapper {
+        height: auto;
+        overflow-y: visible;
+    }
+
+    .shop-grid,
+    .shop-grid--full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .shop-topbar {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .shop-grid,
+    .shop-grid--full {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem 0.5rem;
+    }
 }

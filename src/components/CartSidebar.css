@@ -91,21 +91,23 @@
 }
 
 .cart-sidebar__browse-btn {
-    padding: 0.7rem 1.6rem;
-    background: #000;
-    color: #F8EEDF;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 0.7rem 1.8rem;
+    background: transparent;
+    color: #000;
+    border: 1.5px solid rgba(0, 0, 0, 0.18);
+    border-radius: 30px;
+    font-size: 0.82rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .cart-sidebar__browse-btn:hover {
     background: #8E1616;
+    border-color: #8E1616;
+    color: #F8EEDF;
 }
 
 /* ── Item List ─────────────────────────────────────────────── */
@@ -214,6 +216,7 @@
     text-align: center;
     font-size: 0.85rem;
     font-weight: 600;
+    color: #8E1616;
 }
 
 /* Remove */

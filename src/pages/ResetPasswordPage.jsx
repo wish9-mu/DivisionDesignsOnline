@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import gsap from "gsap";
+import "./AuthPage.css";
+import logo from "../assets/DD LOGO.png";
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState("");
@@ -11,8 +14,37 @@ const ResetPasswordPage = () => {
   const [ready, setReady] = useState(false);
   const navigate = useNavigate();
 
+  const brandRef = useRef(null);
+  const formRef = useRef(null);
+  const logoRef = useRef(null);
+
   useEffect(() => {
-    // Supabase puts the token in the URL hash: #access_token=...&type=recovery
+    // GSAP Entry Animation
+    let ctx = gsap.context(() => {
+      // Logo heartbeat/entrance
+      gsap.fromTo(logoRef.current,
+        { scale: 0.5, rotation: -15, opacity: 0 },
+        { scale: 1, rotation: 0, opacity: 1, duration: 1.2, ease: "elastic.out(1, 0.5)" }
+      );
+
+      // Stagger brand texts
+      if (brandRef.current) {
+        gsap.fromTo(brandRef.current.children,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out", delay: 0.2 }
+        );
+      }
+
+      // Stagger form elements
+      if (formRef.current) {
+        gsap.fromTo(formRef.current.children,
+          { x: 20, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out", delay: 0.4 }
+        );
+      }
+    });
+
+    // Supabase URL Hash parsing
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.replace("#", ""));
     const accessToken = params.get("access_token");
@@ -28,13 +60,14 @@ const ResetPasswordPage = () => {
             setError("Invalid or expired reset link. Please request a new one.");
           } else {
             setReady(true);
-            // Clean the hash from the URL without triggering a reload
             window.history.replaceState(null, "", window.location.pathname);
           }
         });
     } else {
       setError("Invalid or expired reset link. Please request a new one.");
     }
+
+    return () => ctx.revert();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -62,73 +95,97 @@ const ResetPasswordPage = () => {
     setLoading(false);
   };
 
-  // Still setting up session
-  if (!ready && !error) {
-    return (
-      <div style={containerStyle}>
-        <div style={cardStyle}>
-          <p style={{ color: "#555", textAlign: "center" }}>Verifying reset link…</p>
-        </div>
-      </div>
-    );
-  }
+  const passwordsMatch = password === confirm || confirm === "";
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={{ marginTop: 0, color: "#000" }}>Set New Password</h2>
-        <p style={{ color: "#555", marginTop: 0, marginBottom: 16 }}>
-          Enter and confirm your new password below.
-        </p>
+    <div className="auth-split">
+      {/* Left: brand panel */}
+      <div className="auth-brand">
+        <div className="auth-brand__inner" ref={brandRef}>
+          <Link to="/" className="auth-brand__logo-wrap">
+            <img src={logo} alt="Division Designs" className="auth-brand__logo" ref={logoRef} />
+          </Link>
+          <h2 className="auth-brand__headline">
+            Secure
+            <br />
+            Account.
+          </h2>
+          <p className="auth-brand__body">
+            Set a new, strong password to regain access and continue managing your account securely.
+          </p>
+          <div className="auth-brand__switch">
+            <span>Remembered it?</span>
+            <Link to="/sign-in" className="auth-brand__switch-link">
+              Back to Sign In →
+            </Link>
+          </div>
+        </div>
+      </div>
 
-        {error && <div style={errorStyle}>{error}</div>}
-        {message && <div style={successStyle}>{message}</div>}
+      {/* Right: form panel */}
+      <div className="auth-form-panel">
+        <div className="auth-form-panel__inner" ref={formRef}>
+          <h1 className="auth-form-panel__title">Set New Password</h1>
 
-        {ready && (
-          <form onSubmit={handleSubmit}>
-            <label style={labelStyle}>New Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minimum 8 characters"
-              style={inputStyle}
-              required
-              minLength={8}
-            />
+          {!ready && !error ? (
+            <p className="auth-brand__body" style={{ color: "rgba(0,0,0,0.6)", marginBottom: "1.5rem" }}>
+              Verifying reset link…
+            </p>
+          ) : (
+            <>
+              <p className="auth-brand__body" style={{ color: "rgba(0,0,0,0.6)", marginBottom: "1.5rem" }}>
+                Enter and confirm your new password below.
+              </p>
 
-            <label style={{ ...labelStyle, marginTop: 12 }}>Confirm Password</label>
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              placeholder="Repeat your password"
-              style={inputStyle}
-              required
-            />
+              {error && <div className="auth-form__error-banner">{error}</div>}
+              {message && (
+                <div style={{ background: "#e6ffef", color: "#176f3e", padding: "10px 14px", borderRadius: 8, marginBottom: "1rem", fontSize: "0.85rem", fontWeight: 600 }}>
+                  {message}
+                </div>
+              )}
 
-            <button type="submit" disabled={loading} style={btnStyle}>
-              {loading ? "Updating…" : "Update Password"}
-            </button>
-          </form>
-        )}
+              {ready && (
+                <form className="auth-form" onSubmit={handleSubmit}>
+                  <div className="auth-form__group">
+                    <label htmlFor="password">New Password</label>
+                    <input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Minimum 8 characters"
+                      required
+                      minLength={8}
+                    />
+                  </div>
 
-        {error && (
-          <button onClick={() => navigate("/sign-in")} style={{ ...btnStyle, marginTop: 8, background: "#555" }}>
-            Back to Sign In
-          </button>
-        )}
+                  <div className="auth-form__group">
+                    <label htmlFor="confirm">Confirm Password</label>
+                    <input
+                      id="confirm"
+                      type="password"
+                      value={confirm}
+                      onChange={(e) => setConfirm(e.target.value)}
+                      placeholder="Repeat your password"
+                      required
+                      className={!passwordsMatch ? 'auth-form__input--error' : ''}
+                    />
+                    {!passwordsMatch && (
+                      <span className="auth-form__error">Passwords do not match</span>
+                    )}
+                  </div>
+
+                  <button type="submit" disabled={!passwordsMatch || loading} className="auth-form__submit" style={{ marginTop: "1rem" }}>
+                    {loading ? "Updating…" : "Update Password"}
+                  </button>
+                </form>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
 };
-
-const containerStyle = { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f5f5" };
-const cardStyle = { width: 420, maxWidth: "94%", background: "#fff", borderRadius: 8, padding: 28, boxShadow: "0 10px 30px rgba(0,0,0,0.15)", color: "#000" };
-const labelStyle = { display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6, color: "#000" };
-const inputStyle = { width: "100%", padding: "10px 12px", borderRadius: 6, border: "1px solid #ddd", boxSizing: "border-box", marginBottom: 4 };
-const btnStyle = { width: "100%", marginTop: 16, background: "#8f1414", color: "#fff", border: "none", padding: "11px 14px", borderRadius: 6, cursor: "pointer", fontWeight: 600 };
-const errorStyle = { background: "#ffecec", color: "#a33", padding: "8px 10px", borderRadius: 6, marginBottom: 8 };
-const successStyle = { background: "#e6ffef", color: "#176f3e", padding: "8px 10px", borderRadius: 6, marginBottom: 8 };
 
 export default ResetPasswordPage;

@@ -1,11 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabaseClient";
+import gsap from "gsap";
 
 const ForgotPasswordModal = ({ open, onClose }) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const overlayRef = useRef(null);
+  const modalRef = useRef(null);
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      // Entrance Animation
+      const tl = gsap.timeline();
+
+      tl.fromTo(overlayRef.current,
+        { autoAlpha: 0, backdropFilter: "blur(0px)" },
+        { autoAlpha: 1, backdropFilter: "blur(8px)", duration: 0.4, ease: "power2.out" }
+      )
+        .fromTo(modalRef.current,
+          { y: 50, scale: 0.9, autoAlpha: 0, rotationX: 15 },
+          { y: 0, scale: 1, autoAlpha: 1, rotationX: 0, duration: 0.7, ease: "expo.out", transformPerspective: 800 },
+          "-=0.2"
+        );
+
+      if (contentRef.current) {
+        gsap.fromTo(contentRef.current.children,
+          { y: 20, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.08, ease: "power3.out", delay: 0.3 }
+        );
+      }
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    // Exit Animation
+    const tl = gsap.timeline({ onComplete: onClose });
+    tl.to(modalRef.current, { y: 20, scale: 0.95, autoAlpha: 0, duration: 0.3, ease: "power2.in" })
+      .to(overlayRef.current, { autoAlpha: 0, backdropFilter: "blur(0px)", duration: 0.3, ease: "power2.in" }, "-=0.2");
+  };
 
   if (!open) return null;
 
@@ -38,34 +74,40 @@ const ForgotPasswordModal = ({ open, onClose }) => {
   };
 
   return (
-    <div style={overlayStyle} role="dialog" aria-modal="true">
-      <div style={modalStyle}>
-        <h3 style={{ marginTop: 0 }}>Reset password</h3>
-        <p style={{ marginTop: 0, marginBottom: 12 }}>Enter your email to receive a password reset link.</p>
+    <div style={overlayStyle} role="dialog" aria-modal="true" ref={overlayRef}>
+      <div style={modalStyle} ref={modalRef}>
+        <div ref={contentRef} style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+          <h1 className="auth-form-panel__title" style={{ marginBottom: "0.5rem" }}>Reset password</h1>
+          <p className="auth-brand__body" style={{ color: "rgba(0,0,0,0.6)", marginBottom: "1.5rem" }}>
+            Enter your email to receive a password reset link.
+          </p>
 
-        {error && <div style={bannerErrorStyle}>{error}</div>}
-        {message && <div style={bannerSuccessStyle}>{message}</div>}
+          {error && <div className="auth-form__error-banner">{error}</div>}
+          {message && <div style={bannerSuccessStyle}>{message}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <label style={{ display: "block", fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Email</label>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder="you@domain.com"
-            style={inputStyle}
-            required
-          />
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="auth-form__group">
+              <label htmlFor="reset-email">Email</label>
+              <input
+                id="reset-email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="you@domain.com"
+                required
+              />
+            </div>
 
-          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button type="submit" disabled={loading} style={primaryBtnStyle}>
-              {loading ? "Sending…" : "Send Reset Link"}
-            </button>
-            <button type="button" onClick={onClose} style={secondaryBtnStyle}>
-              Close
-            </button>
-          </div>
-        </form>
+            <div style={{ display: "flex", gap: "12px", marginTop: "0.5rem" }}>
+              <button type="submit" disabled={loading} className="auth-form__submit" style={{ flex: 1 }}>
+                {loading ? "Sending…" : "Send Reset Link"}
+              </button>
+              <button type="button" onClick={handleClose} className="auth-form__submit" style={{ flex: 1, background: "transparent", color: "#8E1616", border: "1.5px solid rgba(0,0,0,0.15)" }}>
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -74,63 +116,33 @@ const ForgotPasswordModal = ({ open, onClose }) => {
 const overlayStyle = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,0.4)",
+  background: "rgba(0,0,0,0.45)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   zIndex: 1200,
+  visibility: "hidden", // GSAP will handle visibility
 };
 
 const modalStyle = {
   width: 420,
   maxWidth: "94%",
-  background: "#fff",
-  borderRadius: 8,
-  padding: 20,
-  boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+  background: "#ffffff",
+  borderRadius: 16,
+  padding: "2.5rem 2rem",
+  boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
   color: "#000",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px 12px",
-  borderRadius: 6,
-  border: "1px solid #ddd",
-  boxSizing: "border-box",
-};
-
-const primaryBtnStyle = {
-  background: "#8f1414",
-  color: "#fff",
-  border: "none",
-  padding: "10px 14px",
-  borderRadius: 6,
-  cursor: "pointer",
-};
-
-const secondaryBtnStyle = {
-  background: "transparent",
-  color: "#333",
-  border: "1px solid #ccc",
-  padding: "10px 14px",
-  borderRadius: 6,
-  cursor: "pointer",
-};
-
-const bannerErrorStyle = {
-  background: "#ffecec",
-  color: "#a33",
-  padding: "8px 10px",
-  borderRadius: 6,
-  marginBottom: 8,
+  visibility: "hidden", // GSAP will handle visibility
 };
 
 const bannerSuccessStyle = {
   background: "#e6ffef",
   color: "#176f3e",
-  padding: "8px 10px",
-  borderRadius: 6,
-  marginBottom: 8,
+  padding: "10px 14px",
+  borderRadius: 8,
+  marginBottom: "1rem",
+  fontSize: "0.85rem",
+  fontWeight: 600,
 };
 
 export default ForgotPasswordModal;

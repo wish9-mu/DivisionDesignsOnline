@@ -5,9 +5,15 @@ import FeaturedProduct from "../components/FeaturedProduct";
 import BestSellers from "../components/BestSellers";
 import HomeAbout from "../components/HomeAbout";
 import TickerTape from "../components/TickerTape";
+import CommunityReel from "../components/CommunityReel";
 
 const HomePage = () => (
-  <Layout hero={<Hero />} preFooter={<HomeAbout />}>
+  <Layout hero={<Hero />} preFooter={
+    <>
+      <HomeAbout />
+      <CommunityReel />
+    </>
+  }>
     <FeaturedProduct />
     <TickerTape />
     <BestSellers />

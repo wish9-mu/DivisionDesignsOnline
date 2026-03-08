@@ -662,3 +662,24 @@
 .product-card__name-link:hover .product-card__name {
   color: #8e1616;
 }
+
+.pdp-gallery__main-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pdp-gallery__placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e8c999;
+}
+
+img.pdp-gallery__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}

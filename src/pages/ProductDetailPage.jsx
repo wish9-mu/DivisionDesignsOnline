@@ -3,10 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../supabaseClient";
-import "./ProductDetailPage.css";
-
-// accordion data
 import { accordionSections } from "../data/accordionData";
+import "./ProductDetailPage.css";
 
 // ── Star Rating component ────────────────────────────────────
 const StarRating = ({ rating }) => (
@@ -14,16 +12,15 @@ const StarRating = ({ rating }) => (
     {[1, 2, 3, 4, 5].map((star) => (
       <span
         key={star}
-        className={`pdp-star${star <= rating ? " pdp-star--filled" : ""}`}
+        className={`pdp-star${
+          star <= rating ? " pdp-star--filled" : ""
+        }`}
       >
         ★
       </span>
     ))}
   </div>
 );
-
-// Default images
-const DEFAULT_IMAGES = [null, null, null];
 
 // ══════════════════════════════════════════════════════════════
 const ProductDetailPage = () => {
@@ -42,9 +39,9 @@ const ProductDetailPage = () => {
     const fetchProduct = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
+        .from("products")
+        .select("*")
+        .eq("id", productId)
         .single();
 
       if (!error && data) {
@@ -119,13 +116,23 @@ const ProductDetailPage = () => {
     });
   };
 
-  const productImages = product?.images || DEFAULT_IMAGES;
+  // Build the image list: use `images` array if available,
+  // otherwise fall back to single `image_url`
+  const productImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.image_url
+        ? [product.image_url]
+        : [];
+
+  const currentImage = productImages[selectedImage] || null;
 
   const avgRating =
     reviews.length > 0
       ? (
-        reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      ).toFixed(2)
+          reviews.reduce((sum, r) => sum + r.rating, 0) /
+          reviews.length
+        ).toFixed(2)
       : 0;
 
   const ratingCounts = [5, 4, 3, 2, 1].map(
@@ -149,22 +156,42 @@ const ProductDetailPage = () => {
           {/* Image Gallery */}
           <div className="pdp-gallery">
             <div className="pdp-gallery__main">
-              <div className="pdp-gallery__main-img" style={{ overflow: 'hidden', position: 'relative' }}>
-                {product.image_url && <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                <span className="pdp-gallery__tag">{product.tag}</span>
+              <div className="pdp-gallery__main-img">
+                {currentImage ? (
+                  <img
+                    src={currentImage}
+                    alt={`${product.name} - image ${selectedImage + 1}`}
+                  />
+                ) : (
+                  <div className="pdp-gallery__placeholder" />
+                )}
+                <span className="pdp-gallery__tag">
+                  {product.tag}
+                </span>
               </div>
             </div>
-            <div className="pdp-gallery__thumbs">
-              {productImages.map((_, i) => (
-                <button
-                  key={i}
-                  className={`pdp-gallery__thumb${selectedImage === i ? " pdp-gallery__thumb--active" : ""}`}
-                  onClick={() => setSelectedImage(i)}
-                >
-                  <div className="pdp-gallery__thumb-img" />
-                </button>
-              ))}
-            </div>
+
+            {productImages.length > 1 && (
+              <div className="pdp-gallery__thumbs">
+                {productImages.map((imgUrl, i) => (
+                  <button
+                    key={i}
+                    className={`pdp-gallery__thumb${
+                      selectedImage === i
+                        ? " pdp-gallery__thumb--active"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedImage(i)}
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`${product.name} thumbnail ${i + 1}`}
+                      className="pdp-gallery__thumb-img"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -185,12 +212,29 @@ const ProductDetailPage = () => {
               <span className="pdp-info__type">{product.type}</span>
             </div>
 
-            <p className="pdp-info__description">{product.description || "No description available."}</p>
+            <p className="pdp-info__description">
+              {product.description || "No description available."}
+            </p>
 
-            <p className="pdp-info__price">₱{Number(product.price).toFixed(2)}</p>
+            <p className="pdp-info__price">
+              ₱{Number(product.price).toFixed(2)}
+            </p>
 
-            <p className="pdp-info__stock" style={{ color: product.stock > 0 ? 'green' : 'var(--color-primary-dark)', fontSize: '0.9rem', marginBottom: '1.5rem', fontWeight: '500' }}>
-              {product.stock > 0 ? `${product.stock} items available` : 'Out of Stock'}
+            <p
+              className="pdp-info__stock"
+              style={{
+                color:
+                  product.stock > 0
+                    ? "green"
+                    : "var(--color-primary-dark)",
+                fontSize: "0.9rem",
+                marginBottom: "1.5rem",
+                fontWeight: "500",
+              }}
+            >
+              {product.stock > 0
+                ? `${product.stock} items available`
+                : "Out of Stock"}
             </p>
 
             {/* Quantity */}
@@ -199,16 +243,27 @@ const ProductDetailPage = () => {
               <div className="pdp-qty">
                 <button
                   className="pdp-qty__btn"
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  onClick={() =>
+                    setQty((q) => Math.max(1, q - 1))
+                  }
                   disabled={product.stock <= 0}
                 >
                   −
                 </button>
-                <span className="pdp-qty__value">{product.stock <= 0 ? 0 : qty}</span>
+                <span className="pdp-qty__value">
+                  {product.stock <= 0 ? 0 : qty}
+                </span>
                 <button
                   className="pdp-qty__btn"
-                  onClick={() => setQty((q) => Math.min(q + 1, product.stock || Infinity))}
-                  disabled={product.stock <= 0 || qty >= (product.stock || Infinity)}
+                  onClick={() =>
+                    setQty((q) =>
+                      Math.min(q + 1, product.stock || Infinity)
+                    )
+                  }
+                  disabled={
+                    product.stock <= 0 ||
+                    qty >= (product.stock || Infinity)
+                  }
                 >
                   +
                 </button>
@@ -221,17 +276,25 @@ const ProductDetailPage = () => {
                 className="pdp-actions__add"
                 onClick={handleAddToCart}
                 disabled={product.stock <= 0}
-                style={{ opacity: product.stock <= 0 ? 0.5 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
+                style={{
+                  opacity: product.stock <= 0 ? 0.5 : 1,
+                  cursor:
+                    product.stock <= 0 ? "not-allowed" : "pointer",
+                }}
               >
-                {product.stock <= 0 ? 'Out of Stock' : 'Add to Cart'}
+                {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
               </button>
               <button
                 className="pdp-actions__buy"
                 onClick={handleAddToCart}
                 disabled={product.stock <= 0}
-                style={{ opacity: product.stock <= 0 ? 0.5 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
+                style={{
+                  opacity: product.stock <= 0 ? 0.5 : 1,
+                  cursor:
+                    product.stock <= 0 ? "not-allowed" : "pointer",
+                }}
               >
-                {product.stock <= 0 ? 'Out of Stock' : 'Buy it Now'}
+                {product.stock <= 0 ? "Out of Stock" : "Buy it Now"}
               </button>
             </div>
 
@@ -240,7 +303,11 @@ const ProductDetailPage = () => {
               {accordionSections.map((section, i) => (
                 <div
                   key={i}
-                  className={`pdp-accordion${openAccordion === i ? " pdp-accordion--open" : ""}`}
+                  className={`pdp-accordion${
+                    openAccordion === i
+                      ? " pdp-accordion--open"
+                      : ""
+                  }`}
                 >
                   <button
                     className="pdp-accordion__header"
@@ -253,9 +320,11 @@ const ProductDetailPage = () => {
                   </button>
                   {openAccordion === i && (
                     <div className="pdp-accordion__body">
-                      {section.content.split("\n").map((line, j) => (
-                        <p key={j}>{line}</p>
-                      ))}
+                      {section.content
+                        .split("\n")
+                        .map((line, j) => (
+                          <p key={j}>{line}</p>
+                        ))}
                     </div>
                   )}
                 </div>
@@ -309,7 +378,8 @@ const ProductDetailPage = () => {
           <div className="pdp-reviews__list">
             {reviews.length === 0 ? (
               <p className="pdp-reviews__empty">
-                No reviews yet. Reviews come from verified buyers only.
+                No reviews yet. Reviews come from verified buyers
+                only.
               </p>
             ) : (
               reviews.map((review) => (
@@ -320,26 +390,28 @@ const ProductDetailPage = () => {
                       <span className="pdp-review-card__name">
                         {review.reviewer_name}
                       </span>
-                      {/* Verified buyer badge */}
                       <span className="pdp-review-card__verified">
                         ✓ Verified Buyer
                       </span>
                     </div>
                     <span className="pdp-review-card__date">
-                      {new Date(review.created_at).toLocaleDateString(
-                        "en-US",
-                        {
-                          month: "2-digit",
-                          day: "2-digit",
-                          year: "numeric",
-                        }
-                      )}
+                      {new Date(
+                        review.created_at
+                      ).toLocaleDateString("en-US", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        year: "numeric",
+                      })}
                     </span>
                   </div>
                   {review.title && (
-                    <h4 className="pdp-review-card__title">{review.title}</h4>
+                    <h4 className="pdp-review-card__title">
+                      {review.title}
+                    </h4>
                   )}
-                  <p className="pdp-review-card__body">{review.body}</p>
+                  <p className="pdp-review-card__body">
+                    {review.body}
+                  </p>
                 </div>
               ))
             )}

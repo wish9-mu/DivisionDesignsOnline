@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './Hero.css';
 import hero1 from '../assets/Hero1.png';
 import hero2 from '../assets/Hero2.png';
 import hero3 from '../assets/Hero3.png';
+import gsap from 'gsap';
 
 const slides = [
     {
@@ -40,6 +41,21 @@ const Hero = () => {
     const [current, setCurrent] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
+    const heroRef = useRef(null);
+
+    useEffect(() => {
+        let ctx = gsap.context(() => {
+            gsap.fromTo('.hero__eyebrow, .hero__title, .hero__subtitle',
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out' }
+            );
+            gsap.fromTo('.hero__cta-group',
+                { opacity: 0, y: 10 },
+                { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: 'power3.out' }
+            );
+        }, heroRef);
+        return () => ctx.revert();
+    }, [current]);
 
     const goTo = useCallback((index) => {
         if (isAnimating) return;
@@ -68,6 +84,7 @@ const Hero = () => {
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
             aria-label="Hero Slideshow"
+            ref={heroRef}
         >
             {/* Slides */}
             {slides.map((slide, index) => (

@@ -139,7 +139,7 @@ const ResetPasswordPage = () => {
 
               {error && <div className="auth-form__error-banner">{error}</div>}
               {message && (
-                <div style={{ background: "#e6ffef", color: "#176f3e", padding: "10px 14px", borderRadius: 8, marginBottom: "1rem", fontSize: "0.85rem", fontWeight: 600 }}>
+                <div style={{ background: "#edf1ea", color: "#384a29", border: "1px solid #c8d1c0", padding: "10px 14px", borderRadius: 8, marginBottom: "1rem", fontSize: "0.85rem", fontWeight: 600 }}>
                   {message}
                 </div>
               )}

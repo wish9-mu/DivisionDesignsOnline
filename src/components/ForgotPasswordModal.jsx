@@ -136,8 +136,9 @@ const modalStyle = {
 };
 
 const bannerSuccessStyle = {
-  background: "#e6ffef",
-  color: "#176f3e",
+  background: "#edf1ea",
+  color: "#384a29",
+  border: "1px solid #c8d1c0",
   padding: "10px 14px",
   borderRadius: 8,
   marginBottom: "1rem",

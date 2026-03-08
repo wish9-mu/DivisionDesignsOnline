@@ -63,6 +63,9 @@ const initialProducts = [
   },
 ];
 
+const initialCustomOrders = [];
+const initialAppointments = [];
+
 const initialOrders = [
   {
     id: "ORD-2024-001",
@@ -147,6 +150,10 @@ const AdminPage = () => {
   const [orders, setOrders] = useState(initialOrders);
   const [customOrders, setCustomOrders] = useState(initialCustomOrders);
   const [appointments, setAppointments] = useState(initialAppointments);
+
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingCustomOrders, setLoadingCustomOrders] = useState(false);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
 
   const normalizeCustomStatus = useCallback((status) => {
     const value = String(status ?? "")

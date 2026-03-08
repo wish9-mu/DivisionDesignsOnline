@@ -45,8 +45,8 @@ const CartSidebar = () => {
                             {items.map(item => (
                                 <li key={item.id} className="cart-item">
                                     <div className="cart-item__image">
-                                        {item.image && (
-                                            <img src={item.image} alt={item.name} />
+                                        {item.image_url && (
+                                            <img src={item.image_url} alt={item.name} />
                                         )}
                                     </div>
                                     <div className="cart-item__info">

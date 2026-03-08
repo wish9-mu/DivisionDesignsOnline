@@ -7,6 +7,7 @@ const AdminProducts = ({ products, setProducts, isSupabaseConnected, badgeClass 
     const [showModal, setShowModal] = useState(false);
     const [editProduct, setEditProduct] = useState(null);
     const [formData, setFormData] = useState(emptyProduct);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const openAddModal = () => {
         setEditProduct(null);
@@ -66,6 +67,13 @@ const AdminProducts = ({ products, setProducts, isSupabaseConnected, badgeClass 
         <>
             <div className="admin__section-header">
                 <h2 className="admin__section-title">All Products ({products.length})</h2>
+                <input
+                    className="admin__search"
+                    type="text"
+                    placeholder="Search products…"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                />
                 <button className="admin__add-btn" onClick={openAddModal}>+ Add Product</button>
             </div>
             <div style={{ marginBottom: '1rem', padding: '0.75rem', background: isSupabaseConnected ? '#d4edda' : '#fff3cd', borderRadius: '4px', fontSize: '0.875rem', border: '1px solid' + (isSupabaseConnected ? '#c3e6cb' : '#ffeeba') }}>
@@ -79,7 +87,11 @@ const AdminProducts = ({ products, setProducts, isSupabaseConnected, badgeClass 
                         </tr>
                     </thead>
                     <tbody>
-                        {products.map(product => (
+                        {products.filter(product => {
+                            if (!searchTerm) return true;
+                            const q = searchTerm.toLowerCase();
+                            return [product.name, product.type, product.tag].some(val => String(val ?? '').toLowerCase().includes(q));
+                        }).map(product => (
                             <tr key={product.id}>
                                 <td>
                                     <div className="admin__table-product">

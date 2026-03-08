@@ -6,6 +6,7 @@ import signinBg from "../assets/signin-bg.png";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
 import gsap from "gsap";
+import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 const SignInPage = () => {
   const { signIn } = useAuth();
@@ -16,6 +17,7 @@ const SignInPage = () => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
 
   const brandRef = useRef(null);
   const formRef = useRef(null);
@@ -150,9 +152,9 @@ const SignInPage = () => {
             <div className="auth-form__group">
               <div className="auth-form__label-row">
                 <label htmlFor="password">Password</label>
-                <button type="button" className="auth-form__forgot">
-                  Forgot password?
-                </button>
+                  <button type="button" className="auth-form__forgot" onClick={() => setShowForgot(true)}>
+                    Forgot password?
+                  </button>
               </div>
 
               <div className="auth-form__pass-wrap">
@@ -180,6 +182,7 @@ const SignInPage = () => {
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </form>
+          <ForgotPasswordModal open={showForgot} onClose={() => setShowForgot(false)} />
         </div>
       </div>
     </div>

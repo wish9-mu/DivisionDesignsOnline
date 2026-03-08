@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const AdminCustomOrders = ({
   customOrders,
@@ -6,11 +6,25 @@ const AdminCustomOrders = ({
   CUSTOM_STATUSES,
   badgeClass,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const formatDate = (value) => {
     if (!value) return "—";
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString();
   };
+
+  const filtered = customOrders.filter((order) => {
+    if (!searchTerm) return true;
+    const q = searchTerm.toLowerCase();
+    return [
+      order.reference_id ?? order.id,
+      order.org_name ?? order.org,
+      order.contact_email ?? order.email,
+      order.lanyard_type ?? order.material,
+      order.status,
+    ].some((val) => String(val ?? "").toLowerCase().includes(q));
+  });
 
   return (
     <>
@@ -18,6 +32,13 @@ const AdminCustomOrders = ({
         <h2 className="admin__section-title">
           Custom Order Requests ({customOrders.length})
         </h2>
+        <input
+          className="admin__search"
+          type="text"
+          placeholder="Search custom orders…"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
       <div className="admin__table-wrap">
         <table className="admin__table">
@@ -34,7 +55,7 @@ const AdminCustomOrders = ({
             </tr>
           </thead>
           <tbody>
-            {customOrders.map((order) => (
+            {filtered.map((order) => (
               <tr key={order.id ?? order.reference_id}>
                 <td style={{ fontWeight: 600 }}>
                   {order.reference_id ?? order.id}

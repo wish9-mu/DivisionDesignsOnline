@@ -11,6 +11,7 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   const { pathname } = useLocation();
   const isHome = pathname === "/";
   const { count, setOpen } = useCart();
@@ -77,10 +78,24 @@ const Navbar = () => {
     };
   }, [user]);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
+      try {
+        const { data, error } = await supabase
+          .from("products") // Replace with your table name
+          .select("*")
+          .ilike("name", `%${searchQuery}%`); // Case-insensitive search
+
+        if (error) {
+          console.error("Search error:", error.message);
+        } else {
+          console.log("Search results:", data);
+          setSearchResults(data);
+        }
+      } catch (err) {
+        console.error("Search failed:", err);
+      }
       setSearchOpen(false);
     }
   };
@@ -116,6 +131,36 @@ const Navbar = () => {
 
   const authReady = !authLoading;
 
+  const handleSearchInputChange = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim()) {
+      try {
+        const { data, error } = await supabase
+          .from("products") // Replace with your table name
+          .select("*")
+          .ilike("name", `%${query}%`); // Case-insensitive search
+
+        if (error) {
+          console.error("Search error:", error.message);
+        } else {
+          setSearchResults(data);
+        }
+      } catch (err) {
+        console.error("Search failed:", err);
+      }
+    } else {
+      setSearchResults([]); // Clear results if query is empty
+    }
+  };
+
+  const handleResultClick = (id) => {
+    setSearchOpen(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    navigate(`/products/${id}`); // Corrected route
+  };
   return (
     <nav className={`navbar${scrolled || !isHome ? " scrolled" : ""}`}>
       <div className="navbar-brand">
@@ -295,7 +340,7 @@ const Navbar = () => {
                 type="text"
                 placeholder="Search"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchInputChange}
                 className="search-overlay-input"
               />
             </form>
@@ -326,6 +371,21 @@ const Navbar = () => {
                     {term}
                   </button>
                 )
+              )}
+            </div>
+            <div className="search-results">
+              {searchResults.length > 0 ? (
+                searchResults.map((result) => (
+                  <div
+                    key={result.id}
+                    className="search-result-item"
+                    onClick={() => handleResultClick(result.id)}
+                  >
+                    <p>{result.name}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No results found</p>
               )}
             </div>
           </div>

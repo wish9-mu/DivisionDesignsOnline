@@ -234,7 +234,7 @@
     margin: 0;
 }
 
-.qty-control {
+ qty-control {
     display: flex;
     align-items: center;
     border: 1px solid rgba(0, 0, 0, 0.15);
@@ -242,7 +242,7 @@
     overflow: hidden;
 }
 
-.qty-control button {
+ qty-control button {
     background: none;
     border: none;
     width: 32px;
@@ -255,11 +255,11 @@
     transition: background 0.2s;
 }
 
-.qty-control button:hover {
+ qty-control button:hover {
     background: #f0f0f0;
 }
 
-.qty-control span {
+ qty-control span {
     min-width: 28px;
     text-align: center;
     font-weight: 600;
@@ -556,4 +556,60 @@
         flex-direction: column;
         align-items: stretch;
     }
+}
+
+/* Styling for the calendar */
+.react-calendar {
+  width: 100%;
+  max-width: 100%;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.125em;
+}
+
+.react-calendar__navigation button {
+  color: black; /* Changed navigation buttons to black */
+  min-width: 44px;
+  background: none;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 10px 6.6667px;
+  background: none;
+  text-align: center;
+  line-height: 16px;
+  color: black; /* Changed date text color to black */
+  border-radius: 6px;
+  border: none;
+}
+
+.react-calendar__tile--now {
+  background: #e6f7ff;
+  border-radius: 6px;
+  color: black; /* Ensure current date is black */
+}
+
+.react-calendar__tile--active {
+  background: #1890ff;
+  border-radius: 6px;
+  color: white;
+}
+
+.react-calendar__tile--disabled {
+  background: #f0f0f0;
+  color: #d6d6d6;
+}
+
+.react-calendar__tile--hover {
+  background: #f0f0f0;
+  color: black; /* Ensure hover text is black */
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: black; /* Changed weekend dates to black */
 }

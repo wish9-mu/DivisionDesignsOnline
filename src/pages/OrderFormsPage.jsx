@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import './PageStyles.css';
@@ -11,6 +12,7 @@ const OrderFormsPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderComplete, setOrderComplete] = useState(false);
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [form, setForm] = useState({
         fullName: '',
@@ -19,6 +21,8 @@ const OrderFormsPage = () => {
         contact: '',
         paymentMethod: 'GCash'
     });
+
+    const isUuid = (value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
 
     const handleCheckout = async (e) => {
         e.preventDefault();
@@ -31,13 +35,36 @@ const OrderFormsPage = () => {
         setIsSubmitting(true);
 
         try {
+            const orderCode = `ORD-${new Date().getFullYear()}-${String(
+                Math.floor(Math.random() * 1e6)
+            ).padStart(6, '0')}`;
+
             // Subtract stock for each item in the cart
             const updatePromises = items.map(async (item) => {
+                let productId = item.id;
+
+                // Some cart items can come from old/static IDs (e.g. slugs or p1/p2).
+                // Resolve the real DB UUID first, then update stock by UUID.
+                if (!isUuid(productId)) {
+                    const { data: resolvedProduct, error: resolveError } = await supabase
+                        .from('products')
+                        .select('id, stock')
+                        .eq('name', item.name)
+                        .maybeSingle();
+
+                    if (resolveError) throw resolveError;
+                    if (!resolvedProduct) {
+                        throw new Error(`Product not found for cart item: ${item.name}`);
+                    }
+
+                    productId = resolvedProduct.id;
+                }
+
                 // Fetch current stock to ensure we don't go below 0
                 const { data: productData, error: fetchError } = await supabase
                     .from('products')
                     .select('stock')
-                    .eq('id', item.id)
+                    .eq('id', productId)
                     .single();
 
                 if (fetchError) throw fetchError;
@@ -48,15 +75,37 @@ const OrderFormsPage = () => {
                 const { error: updateError } = await supabase
                     .from('products')
                     .update({ stock: newStock })
-                    .eq('id', item.id);
+                    .eq('id', productId);
 
                 if (updateError) throw updateError;
             });
 
             await Promise.all(updatePromises);
 
-            // In a full application, we would also insert an "order" record here 
-            // to track the customer info (form state) and items purchased.
+            const itemsSummary = items
+                .map((item) => `${item.name} x${item.qty}`)
+                .join(', ');
+
+            const { error: orderInsertError } = await supabase
+                .from('orders')
+                .insert([
+                    {
+                        ...(user?.id ? { user_id: user.id } : {}),
+                        order_code: orderCode,
+                        customer_name: form.fullName,
+                        customer_email: form.email,
+                        contact_number: form.contact,
+                        shipping_address: form.address,
+                        payment_method: form.paymentMethod,
+                        items_summary: itemsSummary,
+                        total_amount: Number(total),
+                        status: 'Pending',
+                        order_date: new Date().toISOString().slice(0, 10),
+                        line_items: items,
+                    },
+                ]);
+
+            if (orderInsertError) throw orderInsertError;
 
             clearCart();
             setOrderComplete(true);

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import ScrollToTop from "./components/ScrollToTop";
 import HomePage from "./pages/HomePage";
@@ -21,6 +21,7 @@ import {
 } from './data/policies';
 import { AuthProvider } from "./context/AuthContext";
 
+
 function App() {
   return (
     <AuthProvider>
@@ -38,7 +39,8 @@ function App() {
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/admin" element={<AdminPage />} />
-
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/refund-policy" element={<PolicyPage data={refundPolicy} />} />
         <Route path="/privacy-policy" element={<PolicyPage data={privacyPolicy} />} />
         <Route path="/terms-of-service" element={<PolicyPage data={termsOfService} />} />

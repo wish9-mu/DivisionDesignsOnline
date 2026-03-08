@@ -1,7 +1,44 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import './AdminOrders.css';
 
-const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
+const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES, loading }) => {
+    const [activePrimaryTab, setActivePrimaryTab] = useState('All');
+
+    if (loading) {
+        return <p>Loading orders...</p>;
+    }
+
+    const normalizeStatus = (status) =>
+        (status || '')
+            .toString()
+            .trim()
+            .toLowerCase();
+
+    const filteredOrders = useMemo(() => {
+        return (orders || []).filter((order) => {
+            const status = normalizeStatus(order.status);
+
+            if (activePrimaryTab === 'All') return true;
+            if (activePrimaryTab === 'To Ship') {
+                return ['pending', 'processing', 'to ship', 'to pack', 'to arrange shipment'].includes(status);
+            }
+            if (activePrimaryTab === 'Shipping') {
+                return ['shipped', 'shipping', 'in transit'].includes(status);
+            }
+            if (activePrimaryTab === 'Delivered') {
+                return ['delivered', 'completed'].includes(status);
+            }
+            if (activePrimaryTab === 'Cancellation') {
+                return ['cancelled', 'canceled', 'cancellation'].includes(status);
+            }
+            if (activePrimaryTab === 'Return Or Refund') {
+                return ['returned', 'refunded', 'refund requested'].includes(status) || status.includes('refund') || status.includes('return');
+            }
+
+            return true;
+        });
+    }, [orders, activePrimaryTab]);
+
     return (
         <div className="lazada-orders-container">
             <div className="lazada-breadcrumb">
@@ -16,7 +53,11 @@ const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
 
             <div className="lazada-primary-tabs">
                 {['All', 'To Ship', 'Shipping', 'Delivered', 'Cancellation', 'Return Or Refund'].map(tab => (
-                    <button key={tab} className={`lazada-primary-tab ${tab === 'To Ship' ? 'active' : ''}`}>
+                    <button
+                        key={tab}
+                        className={`lazada-primary-tab ${tab === activePrimaryTab ? 'active' : ''}`}
+                        onClick={() => setActivePrimaryTab(tab)}
+                    >
                         {tab}
                     </button>
                 ))}
@@ -53,7 +94,7 @@ const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
             <div className="lazada-table-toolbar">
                 <div className="lazada-toolbar-left">
                     <input type="checkbox" className="lazada-checkbox" />
-                    <span className="lazada-toolbar-text">Page 1, 1 - {orders.length} of {orders.length} items</span>
+                    <span className="lazada-toolbar-text">Page 1, 1 - {filteredOrders.length} of {filteredOrders.length} items</span>
                     <button className="lazada-btn" disabled>Pack & Print</button>
                     <button className="lazada-btn" disabled>Print Pick List</button>
                     <button className="lazada-btn-outline">Export ⌄</button>
@@ -77,9 +118,9 @@ const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
                             <th style={{ width: '10%' }}>Actions</th>
                         </tr>
                     </thead>
-                    {orders.length > 0 ? (
+                    {filteredOrders.length > 0 ? (
                         <tbody>
-                            {orders.map(order => (
+                            {filteredOrders.map(order => (
                                 <tr key={order.id}>
                                     <td>
                                         <div className="lazada-product-cell">
@@ -98,7 +139,7 @@ const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
                                         </div>
                                     </td>
                                     <td>
-                                        <div className="lazada-amount">₱{order.total.toLocaleString()}</div>
+                                        <div className="lazada-amount">₱{Number(order.total || 0).toLocaleString()}</div>
                                         <div className="lazada-payment">Paid</div>
                                     </td>
                                     <td>
@@ -108,10 +149,10 @@ const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
                                         </div>
                                     </td>
                                     <td>
-                                        <select className="admin__status-select" value={order.status} onChange={e => updateOrderStatus(order.id, e.target.value)} style={{ width: '100%', marginBottom: '4px' }}>
+                                        <select className="admin__status-select" value={order.status || 'Pending'} onChange={e => updateOrderStatus(order.id, e.target.value)} style={{ width: '100%', marginBottom: '4px' }}>
                                             {ORDER_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                                         </select>
-                                        <div className="lazada-date">{order.date}</div>
+                                        <div className="lazada-date">{order.date || 'N/A'}</div>
                                     </td>
                                     <td>
                                         <div className="lazada-actions-col">
@@ -124,7 +165,7 @@ const AdminOrders = ({ orders, updateOrderStatus, ORDER_STATUSES }) => {
                         </tbody>
                     ) : null}
                 </table>
-                {orders.length === 0 && (
+                {filteredOrders.length === 0 && (
                     <div className="lazada-empty-state">
                         Empty Data
                     </div>

@@ -16,7 +16,7 @@
     align-items: center;
     justify-content: center;
     gap: 5rem;
-    padding: 6rem 4rem 7rem;
+    padding: 3rem 4rem 4rem;
     background-color: var(--ha-bg);
     overflow: hidden;
     width: 100%;
@@ -39,6 +39,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
+    margin-top: -190px;
+    margin-left: -150px;
     width: 300px;
     height: 380px;
     background: #fff;
@@ -151,6 +153,8 @@
     .ha-card {
         width: 240px;
         height: 300px;
+        margin-top: -150px;
+        margin-left: -120px;
     }
 
     .ha-text-block {

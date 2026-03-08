@@ -18,11 +18,9 @@ const HomeAbout = () => {
         const ctx = gsap.context(() => {
             // Set initial state
             gsap.set(card1Ref.current, {
-                xPercent: -50, yPercent: -50,
                 x: -20, y: -20, rotationZ: -6, zIndex: 1
             });
             gsap.set(card2Ref.current, {
-                xPercent: -50, yPercent: -50,
                 x: 20, y: 20, rotationZ: 4, zIndex: 2
             });
 

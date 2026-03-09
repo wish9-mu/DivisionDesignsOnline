@@ -10,7 +10,6 @@ const OrderFormsPage = () => {
     const { items, updateQty, total, clearCart } = useCart();
     const [activeTab, setActiveTab] = useState('Cart');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [orderComplete, setOrderComplete] = useState(false);
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -120,8 +119,8 @@ const OrderFormsPage = () => {
                         line_items: items,
                         customer_name: form.fullName,
                         customer_email: form.email,
-                        success_url: `${window.location.origin}/order-forms?success=true`,
-                        cancel_url: `${window.location.origin}/order-forms?cancel=true`
+                        success_url: `${window.location.origin}${import.meta.env.BASE_URL}success`,
+                        cancel_url: `${window.location.origin}${import.meta.env.BASE_URL}cancel`
                     }
                 });
 
@@ -140,7 +139,7 @@ const OrderFormsPage = () => {
             }
 
             clearCart();
-            setOrderComplete(true);
+            navigate('/success');
         } catch (error) {
             console.error("Checkout failed:", error);
             alert(`There was an error processing your checkout: ${error.message || error}`);
@@ -148,42 +147,6 @@ const OrderFormsPage = () => {
             setIsSubmitting(false);
         }
     };
-
-    // Handle successful redirection back from Paymongo
-    React.useEffect(() => {
-        const queryParams = new URLSearchParams(window.location.search);
-        if (queryParams.get('success') === 'true') {
-            setOrderComplete(true);
-            // Optionally, remove the query parameter from URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        } else if (queryParams.get('cancel') === 'true') {
-            alert('Payment was cancelled or failed.');
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, []);
-
-    if (orderComplete) {
-        return (
-            <Layout>
-                <div className="page">
-                    <div className="page__header">
-                        <p className="page__eyebrow">Success</p>
-                        <h1 className="page__title">Order Complete!</h1>
-                        <p className="page__subtitle" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                            Thank you for your purchase, {form.fullName || 'Valued Customer'}! We have successfully received your order and updated our inventory.
-                        </p>
-                        <button
-                            className="page__cta-btn"
-                            style={{ marginTop: '2rem' }}
-                            onClick={() => navigate('/products')}
-                        >
-                            Continue Shopping
-                        </button>
-                    </div>
-                </div>
-            </Layout>
-        );
-    }
 
     return (
         <Layout>

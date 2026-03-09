@@ -56,23 +56,7 @@ const FeaturedProduct = () => {
 
                     <p className="featured-redesign__price">₱210.00</p>
 
-                    <div className="featured-redesign__options">
-                        <div className="featured-redesign__option-group">
-                            <label>Size</label>
-                            <select className="featured-redesign__select" defaultValue="Standard">
-                                <option value="Standard">Standard</option>
-                                <option value="Long">Long</option>
-                            </select>
-                        </div>
 
-                        <div className="featured-redesign__option-group">
-                            <label>Attachment Type</label>
-                            <select className="featured-redesign__select" defaultValue="G-Hook">
-                                <option value="G-Hook">G-Hook</option>
-                                <option value="Trigger Snap">Trigger Snap</option>
-                            </select>
-                        </div>
-                    </div>
 
                     <div className="featured-redesign__qty-group">
                         <label>Quantity</label>

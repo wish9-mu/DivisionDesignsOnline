@@ -66,9 +66,25 @@ const CustomOrdersPage = () => {
   const [isTrackLoading, setIsTrackLoading] = useState(false);
   const [trackInputError, setTrackInputError] = useState("");
   const [trackError, setTrackError] = useState(false);
+  const [recentLookups, setRecentLookups] = useState([]);
   const resultCardRef = useRef(null);
   const { user } = useAuth();
 
+  useEffect(() => {
+    const saved = localStorage.getItem("recentLookups");
+    if (saved) {
+      try { setRecentLookups(JSON.parse(saved)); } catch { /* ignore syntax error */ }
+    }
+  }, []);
+
+  const saveLookup = (order) => {
+    setRecentLookups(prev => {
+      const filtered = prev.filter(p => p.reference_id !== order.reference_id);
+      const updated = [order, ...filtered].slice(0, 5);
+      localStorage.setItem("recentLookups", JSON.stringify(updated));
+      return updated;
+    });
+  };
   useEffect(() => {
     const fetchAppointments = async () => {
       const { data, error } = await supabase
@@ -93,31 +109,31 @@ const CustomOrdersPage = () => {
   useEffect(() => {
     if (trackResult && resultCardRef.current && activeTab === "Track Status") {
       const ctx = gsap.context(() => {
-        gsap.fromTo(resultCardRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+        gsap.fromTo([".track-panel-header", ".track-panel-body", ".track-panel-bottom"],
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: "power3.out" }
         );
 
-        gsap.fromTo(".track-grid-item",
-          { opacity: 0, y: 10 },
+        gsap.fromTo(".v-step-circle",
+          { scale: 0 },
+          {
+            scale: 1,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: "back.out(1.5)",
+            delay: 0.2
+          }
+        );
+
+        gsap.fromTo(".meta-row",
+          { opacity: 0, x: 10 },
           {
             opacity: 1,
-            y: 0,
+            x: 0,
             duration: 0.4,
             stagger: 0.07,
             delay: 0.15,
             ease: "power2.out",
-          }
-        );
-
-        gsap.fromTo(".progress-circle",
-          { scale: 0 },
-          {
-            scale: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: "back.out(1.4)",
-            delay: 0.2
           }
         );
 
@@ -128,7 +144,7 @@ const CustomOrdersPage = () => {
               opacity: 1,
               y: 0,
               duration: 0.4,
-              delay: 0.4,
+              delay: 0.8,
             }
           );
         }
@@ -142,17 +158,11 @@ const CustomOrdersPage = () => {
     const s = (status || "").toLowerCase();
     if (s.includes("pending")) return { label: "Pending Review", className: "status-pending", stepIdx: 1 };
     if (s.includes("production")) return { label: "In Production", className: "status-production", stepIdx: 2 };
-    if (s.includes("quality")) return { label: "Quality Check", className: "status-quality", stepIdx: 3 };
-    if (s.includes("ready")) return { label: "Ready", className: "status-ready", stepIdx: 4 };
-    if (s.includes("shipped")) return { label: "Shipped", className: "status-shipped", stepIdx: 4 };
-    return { label: status || "Submitted", className: "status-default", stepIdx: 0 };
+    if (s.includes("ready") || s.includes("shipped") || s.includes("complete")) return { label: "Completed", className: "status-ready", stepIdx: 3 };
+    return { label: "Submitted Request", className: "status-default", stepIdx: 0 };
   };
 
-  const formatDateString = (dateStr) => {
-    if (!dateStr) return "";
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' };
-    return new Date(dateStr).toLocaleDateString('en-US', options).replace(' at ', ' · ');
-  };
+
 
   const formatAppointmentDate = (dateStr) => {
     if (!dateStr) return "";
@@ -358,6 +368,30 @@ const CustomOrdersPage = () => {
 
       if (data && data.length > 0) {
         setTrackResult(data[0]);
+        saveLookup(data[0]);
+      } else {
+        setTrackError(true);
+      }
+    } catch (err) {
+      console.error("Error fetching order status:", err.message);
+      triggerErrorPopup("An error occurred while tracking the order.");
+    } finally {
+      setIsTrackLoading(false);
+    }
+  };
+
+  const handleTrackSpecific = async (id) => {
+    if (!id) return;
+    setIsTrackLoading(true);
+    setTrackError(false);
+    setTrackResult(null);
+    setTrackId(id);
+    try {
+      const { data, error } = await supabase.from("custom_orders").select("*").ilike("reference_id", id);
+      if (error) throw error;
+      if (data && data.length > 0) {
+        setTrackResult(data[0]);
+        saveLookup(data[0]);
       } else {
         setTrackError(true);
       }
@@ -377,7 +411,7 @@ const CustomOrdersPage = () => {
   };
 
   return (
-    <Layout>
+    <Layout isFullWidth={activeTab === "Track Status"}>
       {showErrorPopup && (
         <div
           ref={errorPopupRef}
@@ -428,14 +462,16 @@ const CustomOrdersPage = () => {
           </p>
         </div>
       )}
-      <div className="page">
-        <div className="page__header">
-          <p className="page__eyebrow">Custom</p>
-          <h1 className="page__title">Custom Orders</h1>
-          <p className="page__subtitle">
-            Design your own lanyard — we'll bring it to life.
-          </p>
-        </div>
+      <div className={`page ${activeTab === "Track Status" ? "page--tracking" : ""}`}>
+        {activeTab !== "Track Status" && (
+          <div className="page__header">
+            <p className="page__eyebrow">Custom</p>
+            <h1 className="page__title">Custom Orders</h1>
+            <p className="page__subtitle">
+              Design your own lanyard — we'll bring it to life.
+            </p>
+          </div>
+        )}
 
         <div className="page__tabs">
           {["Submit Request", "Track Status"].map((tab) => (
@@ -612,63 +648,80 @@ const CustomOrdersPage = () => {
         )}
 
         {activeTab === "Track Status" && (
-          <div className="track-status">
+          <div className="track-app-shell">
             <style>{`
               @keyframes spin-icon {
                 from { transform: rotate(0deg); }
                 to { transform: rotate(360deg); }
               }
             `}</style>
-            <div className="track-card">
-              <div
-                className="form-group"
-              >
-                <label className="track-heading">Order / Reference ID</label>
-                <div className="track-row">
-                  <input
-                    type="text"
-                    placeholder="e.g. DD-2024-0012"
-                    value={trackId}
-                    onChange={(e) => {
-                      setTrackId(e.target.value);
-                      if (trackInputError) setTrackInputError("");
-                    }}
-                    onKeyDown={handleTrackKeyDown}
-                    disabled={isTrackLoading}
-                  />
-                  <button
-                    className="page__cta-btn"
-                    onClick={handleTrack}
-                    disabled={isTrackLoading}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '100px' }}
-                  >
-                    {isTrackLoading ? <Loader2 style={{ animation: "spin-icon 1s linear infinite" }} /> : "Track"}
-                  </button>
-                </div>
-                {trackInputError && (
-                  <p style={{ color: "#8E1616", fontSize: "0.85rem", margin: "0.2rem 0 0", fontWeight: 600 }}>
-                    {trackInputError}
-                  </p>
-                )}
+
+            {/* Left Sidebar */}
+            <div className="track-sidebar">
+              <div className="track-sidebar-header">
+                <span className="sidebar-eyebrow">Custom Orders</span>
+                <h2 className="sidebar-title">Track<br />Your Order</h2>
+                <p className="sidebar-desc">Enter your reference ID below to see the latest updates on your items.</p>
               </div>
 
-              <div className="track-divider"></div>
+              <div className="sidebar-search">
+                <input
+                  type="text"
+                  placeholder="Reference ID"
+                  value={trackId}
+                  onChange={(e) => {
+                    setTrackId(e.target.value);
+                    if (trackInputError) setTrackInputError("");
+                  }}
+                  onKeyDown={handleTrackKeyDown}
+                  disabled={isTrackLoading}
+                />
+                <button
+                  className="sidebar-search-btn"
+                  onClick={handleTrack}
+                  disabled={isTrackLoading}
+                >
+                  {isTrackLoading ? <Loader2 style={{ animation: "spin-icon 1s linear infinite" }} size={18} /> : "Track"}
+                </button>
+              </div>
+              {trackInputError && (
+                <p className="sidebar-error">{trackInputError}</p>
+              )}
 
+              <div className="sidebar-recent">
+                <h3 className="recent-heading">Recent Lookups</h3>
+                {recentLookups.length > 0 ? (
+                  <div className="recent-list">
+                    {recentLookups.map((lookup) => (
+                      <div key={lookup.reference_id} className="recent-card" onClick={() => handleTrackSpecific(lookup.reference_id)}>
+                        <div className="recent-card-left">
+                          <span className="recent-id">{lookup.reference_id}</span>
+                          <span className="recent-org">{lookup.org_name}</span>
+                        </div>
+                        <div className={`status-dot-indicator ${lookup.status.toLowerCase().includes('ready') || lookup.status.toLowerCase().includes('shipped') ? 'inactive' : 'active'}`}></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="recent-empty">No locally saved orders yet.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Right Content */}
+            <div className="track-content">
               {!trackResult && !trackError && !isTrackLoading && (
-                <div className="track-empty">
-                  <p>
-                    Enter your reference ID to check the status of your custom order.
-                  </p>
+                <div className="track-content-empty">
+                  <SearchX size={48} className="empty-icon-muted" style={{ margin: '0 auto 1.5rem', opacity: 0.15 }} />
+                  <p>Enter your reference ID to check the status of your custom order.</p>
                 </div>
               )}
 
               {trackError && !isTrackLoading && (
-                <div className="track-result-card" style={{ opacity: 1, textAlign: 'center', padding: '3rem 2rem' }}>
+                <div className="track-content-empty error">
                   <SearchX size={48} color="#8E1616" style={{ margin: '0 auto 1rem' }} />
-                  <h3 style={{ fontSize: '1.25rem', margin: '0 0 0.5rem', fontWeight: 800 }}>Order Not Found</h3>
-                  <p style={{ color: "var(--ink)", margin: 0, fontSize: '0.95rem' }}>
-                    We couldn't find an order with that Reference ID.<br />Please ensure it follows the format <b>DD-YYYY-XXXXXX</b>.
-                  </p>
+                  <h3>Order Not Found</h3>
+                  <p>We couldn't find an order with that Reference ID.<br />Please ensure it follows the format <b>DD-YYYY-XXXXXX</b>.</p>
                 </div>
               )}
 
@@ -677,91 +730,117 @@ const CustomOrdersPage = () => {
                   {(() => {
                     const statusInfo = getStatusInfo(trackResult.status);
                     const stages = [
-                      "Submitted",
-                      "Pending Review",
-                      "In Production",
-                      "Quality Check",
-                      "Ready / Shipped"
+                      { key: "submitted", label: "Submitted Request", desc: "Order received and logged into the system." },
+                      { key: "pending_review", label: "Pending Review", desc: "Design specs reviewed and approved." },
+                      { key: "in_production", label: "In Production", desc: "Printing underway at production facility." },
+                      { key: "completed", label: "Completed", desc: "Order dispatched and on its way." }
                     ];
+
                     return (
                       <>
-                        <div className="track-header-row">
-                          <div>
-                            <div className="track-heading">Current Status</div>
+                        <div className="track-panel-header">
+                          <div className="panel-col">
+                            <span className="panel-label">Reference ID</span>
+                            <span className="panel-value-id">{trackResult.reference_id}</span>
+                          </div>
+                          <div className="panel-col">
+                            <span className="panel-label">Organization</span>
+                            <span className="panel-value">{trackResult.org_name}</span>
+                          </div>
+                          <div className="panel-col">
+                            <span className="panel-label">Current Status</span>
                             <div className={`status-badge ${statusInfo.className}`}>
                               <div className="status-dot"></div>
                               {statusInfo.label}
                             </div>
                           </div>
-                          <div className="track-submitted">
-                            <div className="track-heading" style={{ textAlign: "right" }}>Submitted</div>
-                            <div className="track-submitted-time">{formatDateString(trackResult.created_at)}</div>
+                          <div className="panel-col">
+                            <span className="panel-label">Submitted</span>
+                            <span className="panel-value-date">
+                              {trackResult.created_at ? new Date(trackResult.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : "Recently"}<br />
+                              <span className="muted-time">{trackResult.created_at ? new Date(trackResult.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ""}</span>
+                            </span>
                           </div>
                         </div>
 
-                        <div className="track-grid">
-                          <div className="info-box track-grid-item">
-                            <span className="info-box-label">Reference ID</span>
-                            <span className="info-box-value mono">{trackResult.reference_id}</span>
-                          </div>
-                          <div className="info-box track-grid-item">
-                            <span className="info-box-label">Organization</span>
-                            <span className="info-box-value">{trackResult.org_name}</span>
-                          </div>
-                          <div className="info-box track-grid-item">
-                            <span className="info-box-label">Quantity</span>
-                            <span className="info-box-value">{trackResult.quantity} {trackResult.quantity === 1 ? 'unit' : 'units'}</span>
-                          </div>
-                          <div className="info-box track-grid-item">
-                            <span className="info-box-label">Lanyard Type</span>
-                            <span className="info-box-value">{trackResult.lanyard_type}</span>
-                          </div>
-                        </div>
+                        <div className="track-panel-body">
+                          <div className="progress-section">
+                            <h4 className="section-title">Order Progress</h4>
+                            <div className="vertical-tracker">
+                              {stages.map((stage, idx) => {
+                                let stepClass = "inactive";
+                                if (idx < statusInfo.stepIdx) stepClass = "completed";
+                                else if (idx === statusInfo.stepIdx) stepClass = "active";
 
-                        {trackResult.design_description && (
-                          <div className="info-box track-grid-item" style={{ marginBottom: '2.5rem' }}>
-                            <span className="info-box-label">Notes</span>
-                            <span className="info-box-value" style={{ fontWeight: 400, color: "var(--muted)" }}>{trackResult.design_description}</span>
-                          </div>
-                        )}
+                                return (
+                                  <div key={stage.key} className={`v-step ${stepClass}`}>
+                                    <div className="v-step-spine">
+                                      <div className="v-step-circle">
+                                        {idx < statusInfo.stepIdx ? "✓" : (idx === statusInfo.stepIdx ? (idx === stages.length - 1 ? "✓" : "•") : "")}
+                                      </div>
+                                      {idx < stages.length - 1 && (
+                                        <div className={`v-step-line ${idx < statusInfo.stepIdx ? 'filled' : ''}`}></div>
+                                      )}
+                                    </div>
+                                    <div className="v-step-content">
+                                      <div className="v-step-name">{stage.label}</div>
+                                      <div className="v-step-desc">{stage.desc}</div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
 
-                        <div className="track-heading">Order Progress</div>
-                        <div className="progress-tracker">
-                          <div className="progress-line-container">
-                            <div
-                              className="progress-line-fill"
-                              style={{ width: `${(statusInfo.stepIdx / (stages.length - 1)) * 100}%` }}
-                            ></div>
-                          </div>
-                          {stages.map((stage, idx) => {
-                            let stepClass = "";
-                            if (idx < statusInfo.stepIdx) stepClass = "completed";
-                            else if (idx === statusInfo.stepIdx) stepClass = "current";
-
-                            return (
-                              <div key={stage} className={`progress-step ${stepClass}`}>
-                                <div className="progress-circle">
-                                  {idx <= statusInfo.stepIdx && idx !== 0 && statusInfo.stepIdx > 0 ? "✓" : (idx === 0 && statusInfo.stepIdx > 0 ? "✓" : (idx === statusInfo.stepIdx && idx === 0 ? "•" : ""))}
+                            {trackResult.appointment_date && (
+                              <div className="appointment-block">
+                                <div className="appointment-icon">
+                                  <CalendarDays size={20} />
                                 </div>
-                                <span className="progress-label">{stage}</span>
+                                <div className="appointment-details">
+                                  <span className="appointment-label">Appointment Scheduled</span>
+                                  <span className="appointment-time">
+                                    {formatAppointmentDate(trackResult.appointment_date)} · {trackResult.appointment_time}
+                                  </span>
+                                </div>
                               </div>
-                            );
-                          })}
+                            )}
+                          </div>
+
+                          <div className="meta-rail">
+                            <div className="meta-row">
+                              <span className="meta-label">Reference ID</span>
+                              <span className="meta-value-id">{trackResult.reference_id}</span>
+                            </div>
+                            <div className="meta-row">
+                              <span className="meta-label">Organization</span>
+                              <span className="meta-value">{trackResult.org_name}</span>
+                            </div>
+                            <div className="meta-row">
+                              <span className="meta-label">Quantity</span>
+                              <span className="meta-value">{trackResult.quantity} units</span>
+                            </div>
+                            <div className="meta-row">
+                              <span className="meta-label">Lanyard Type</span>
+                              <span className="meta-value">{trackResult.lanyard_type}</span>
+                            </div>
+                            {trackResult.design_description && (
+                              <div className="meta-row meta-row-notes">
+                                <span className="meta-label">Notes</span>
+                                <span className="meta-value-notes">{trackResult.design_description}</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
-                        {trackResult.appointment_date && (
-                          <div className="appointment-block">
-                            <div className="appointment-icon">
-                              <CalendarDays size={20} />
-                            </div>
-                            <div className="appointment-details">
-                              <span className="appointment-label">Appointment</span>
-                              <span className="appointment-time">
-                                {formatAppointmentDate(trackResult.appointment_date)} · {trackResult.appointment_time}
-                              </span>
-                            </div>
+                        <div className="track-panel-bottom">
+                          <div className="bottom-left">
+                            <span className="last-updated">Last updated &middot; {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &middot; {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
-                        )}
+                          <div className="bottom-right">
+                            <button className="btn-outline">Download PDF</button>
+                            <button className="btn-solid" onClick={() => window.location.href = '/contact'}>Contact Support</button>
+                          </div>
+                        </div>
                       </>
                     );
                   })()}

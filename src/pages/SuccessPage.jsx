@@ -36,7 +36,7 @@ const SuccessPage = () => {
                         </button>
                         <button
                             className="pre-footer__btn"
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/purchases')}
                         >
                             View Orders
                         </button>

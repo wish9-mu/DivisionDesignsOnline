@@ -8,6 +8,7 @@ import OrderFormsPage from "./pages/OrderFormsPage";
 import CustomOrdersPage from "./pages/CustomOrdersPage";
 import AboutPage from "./pages/AboutPage";
 import ProfilePage from "./pages/ProfilePage";
+import PurchasesPage from "./pages/PurchasesPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import AdminPage from "./pages/AdminPage";
@@ -39,6 +40,7 @@ function App() {
           <Route path="/custom-orders" element={<CustomOrdersPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/purchases" element={<PurchasesPage />} />
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/admin" element={<AdminPage />} />

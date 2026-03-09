@@ -222,9 +222,18 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              <button className="page__cta-btn" onClick={() => setActiveTab("Edit Profile")}>
-                Edit Profile
-              </button>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="page__cta-btn" onClick={() => setActiveTab("Edit Profile")}>
+                  Edit Profile
+                </button>
+                <button
+                  className="page__cta-btn"
+                  style={{ background: '#333' }}
+                  onClick={() => window.location.href = '/DivisionDesigns/purchases'}
+                >
+                  View Order History
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -589,6 +589,7 @@ const CustomOrdersPage = () => {
                     <Calendar
                       onChange={handleDateChange}
                       value={form.appointment_date || new Date()}
+                      minDate={new Date()}
                     />
                   </div>
                 )}

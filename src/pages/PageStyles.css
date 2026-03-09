@@ -605,7 +605,7 @@ qty-control span {
 
 .recent-empty {
     font-size: 0.9rem;
-    color: rgba(248, 238, 223, 0.6);
+    color: rgba(0, 0, 0, 0.6);
     font-style: italic;
 }
 

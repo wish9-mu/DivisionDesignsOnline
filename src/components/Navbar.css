@@ -253,6 +253,8 @@
     font-weight: 600;
     font-size: 1.1rem;
     color: #F8EEDF;
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
 }
 
 .profile-circle:hover {

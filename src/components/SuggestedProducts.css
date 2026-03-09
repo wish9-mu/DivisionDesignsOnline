@@ -1,0 +1,109 @@
+.suggested-products {
+    padding: 4rem 0 2rem;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.suggested-products__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.suggested-products__title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #111;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.suggested-products__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 1rem;
+}
+
+.suggested-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    /* transition: opacity 0.2s; Removed to rely on GSAP completely */
+}
+
+.suggested-card__img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background-color: #f6f6f6;
+    position: relative;
+    margin-bottom: 12px;
+    overflow: hidden;
+    /* Prevent image overflow when scaling */
+}
+
+.suggested-card__img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+    display: block;
+    /* Will-change helps optimize GSAP scale animations */
+    will-change: transform;
+}
+
+.suggested-card__placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #f6f6f6;
+}
+
+.suggested-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    will-change: transform;
+}
+
+.suggested-card__name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.suggested-card__type {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #757575;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.suggested-card__price {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #111;
+    margin: 0;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .suggested-products__grid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 16px;
+        padding-bottom: 16px;
+    }
+
+    .suggested-card {
+        min-width: 75vw;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+    }
+}

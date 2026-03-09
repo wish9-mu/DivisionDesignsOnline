@@ -1,0 +1,241 @@
+.community-reel {
+    width: 100%;
+    padding: 2rem 0;
+    /* Reduced padding to tighten section vertically */
+    background-color: #F8EEDF;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: inherit;
+}
+
+.community-reel__header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 1rem;
+    /* Pull carousel much closer to text */
+    padding: 0 1rem;
+}
+
+.community-reel__title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 0.5rem;
+    line-height: 1.1;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.community-reel__subtitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #8E1616;
+    /* Varsity Red */
+    margin-bottom: 0.5rem;
+    /* Tighter gap between subtitle and body */
+}
+
+.community-reel__body {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 1.6;
+}
+
+.community-reel__body strong {
+    color: #000000;
+    font-weight: 700;
+}
+
+/* Carousel */
+.community-reel__carousel {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.community-reel__track-wrapper {
+    width: 100%;
+    max-width: 100%;
+    /* full width */
+    margin: 0;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 2rem;
+    /* small padding from left edge */
+    box-sizing: border-box;
+}
+
+.community-reel__track {
+    display: flex;
+    gap: 20px;
+    padding: 1rem 0;
+    align-items: center;
+    will-change: transform;
+}
+
+.community-reel__card-wrapper {
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 280px;
+    /* actual card width */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    /* space between card and chip */
+    transform-origin: center center;
+}
+
+.community-reel__card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #E8C999;
+}
+
+.community-reel__video-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.community-reel__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    z-index: 1;
+}
+
+.community-reel__mute-icon {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.community-reel__info {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 40px;
+    /* leave space for mute icon */
+    z-index: 2;
+    color: white;
+}
+
+.community-reel__user {
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+    opacity: 0.9;
+}
+
+.community-reel__user strong {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.community-reel__caption {
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Product Chip */
+.community-reel__chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #F8EEDF;
+    /* cream body */
+    padding: 6px 14px 6px 6px;
+    /* text padding left right */
+    border-radius: 50px;
+    /* pill shape */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* light border */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.community-reel__chip-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.community-reel__chip-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Controls */
+.community-reel__controls {
+    display: flex;
+    gap: 16px;
+    margin-top: 1rem;
+}
+
+.community-reel__nav-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(232, 201, 153, 0.45);
+    background: rgba(0, 0, 0, 0.4);
+    color: #F8EEDF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    padding: 0;
+}
+
+.community-reel__nav-btn:hover:not(:disabled) {
+    background: rgba(142, 22, 22, 0.5);
+    border-color: #8E1616;
+    transform: scale(1.08);
+}
+
+.community-reel__nav-btn:focus-visible {
+    outline: 2px solid #E8C999;
+    outline-offset: 3px;
+}
+
+.community-reel__nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(232, 201, 153, 0.2);
+}
+
+.community-reel__nav-btn::before {
+    display: none;
+    /* override global button back layer */
+}

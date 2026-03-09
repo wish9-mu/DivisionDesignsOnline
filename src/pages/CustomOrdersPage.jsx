@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layout";
 import "./PageStyles.css";
 import { supabase } from "../supabaseClient";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import { useAuth } from "../context/AuthContext";
+import gsap from "gsap";
 
 const CustomOrdersPage = () => {
   const [activeTab, setActiveTab] = useState("Submit Request");
@@ -12,6 +13,8 @@ const CustomOrdersPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const popupRef = useRef(null);
 
   const [form, setForm] = useState({
     org_name: "",
@@ -176,7 +179,33 @@ const CustomOrdersPage = () => {
 
       setGeneratedRef(reference_id);
       setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 3000);
+      setShowPopup(true);
+
+      setTimeout(() => {
+        if (popupRef.current) {
+          gsap.fromTo(
+            popupRef.current,
+            { y: 50, opacity: 0, scale: 0.9 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.5)" }
+          );
+        }
+      }, 50);
+
+      setTimeout(() => {
+        if (popupRef.current) {
+          gsap.to(popupRef.current, {
+            y: 50,
+            opacity: 0,
+            scale: 0.9,
+            duration: 0.4,
+            ease: "power2.in",
+            onComplete: () => {
+              setShowPopup(false);
+              setSubmitted(false);
+            },
+          });
+        }
+      }, 4000);
     } catch (error) {
       if (error.code === "23505") {
         alert("The selected date and time are already booked. Please choose another slot.");
@@ -215,6 +244,31 @@ const CustomOrdersPage = () => {
 
   return (
     <Layout>
+      {showPopup && (
+        <div
+          ref={popupRef}
+          style={{
+            position: "fixed",
+            bottom: "2rem",
+            right: "2rem",
+            background: "#8E1616",
+            color: "#F8EEDF",
+            padding: "1.5rem 2rem",
+            borderRadius: "12px",
+            boxShadow: "0 8px 30px rgba(0,0,0,0.3)",
+            zIndex: 9999,
+            maxWidth: "400px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+          }}
+        >
+          <h4 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 800 }}>Success</h4>
+          <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: 1.5 }}>
+            Thank you for submitting your custom lanyard request! We'll get back to you with your email ({form.contact_email}).
+          </p>
+        </div>
+      )}
       <div className="page">
         <div className="page__header">
           <p className="page__eyebrow">Custom</p>

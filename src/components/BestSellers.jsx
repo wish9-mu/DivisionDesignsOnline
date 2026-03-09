@@ -1,11 +1,13 @@
 // BestSellers.jsx
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./BestSellers.css";
 import { supabase } from '../supabaseClient';
+import gsap from 'gsap';
 
 const BestSellers = () => {
   const [bestSellers, setBestSellers] = React.useState([]);
+  const sectionRef = useRef(null);
 
   React.useEffect(() => {
     const fetchBestSellers = async () => {
@@ -26,8 +28,19 @@ const BestSellers = () => {
     fetchBestSellers();
   }, []);
 
+  useEffect(() => {
+    if (bestSellers.length === 0) return;
+    let ctx = gsap.context(() => {
+      gsap.fromTo('.best-sellers-banner__card',
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out' }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, [bestSellers]);
+
   return (
-    <section className="best-sellers-banner">
+    <section className="best-sellers-banner" ref={sectionRef}>
 
 
       <div className="best-sellers-banner__grid">

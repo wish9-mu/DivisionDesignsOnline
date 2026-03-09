@@ -237,7 +237,7 @@
     margin: 0;
 }
 
- qty-control {
+qty-control {
     display: flex;
     align-items: center;
     border: 1px solid rgba(0, 0, 0, 0.15);
@@ -245,7 +245,7 @@
     overflow: hidden;
 }
 
- qty-control button {
+qty-control button {
     background: none;
     border: none;
     width: 32px;
@@ -258,11 +258,11 @@
     transition: background 0.2s;
 }
 
- qty-control button:hover {
+qty-control button:hover {
     background: #f0f0f0;
 }
 
- qty-control span {
+qty-control span {
     min-width: 28px;
     text-align: center;
     font-weight: 600;
@@ -563,58 +563,153 @@
 
 /* Styling for the calendar */
 .react-calendar {
-  width: 100%;
-  max-width: 100%;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.125em;
+    width: 100%;
+    max-width: 100%;
+    background: #000;
+    color: #F8EEDF;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-family: inherit;
+    line-height: 1.125em;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
 }
 
 .react-calendar__navigation button {
-  color: black; /* Changed navigation buttons to black */
-  min-width: 44px;
-  background: none;
-  font-size: 16px;
-  margin-top: 8px;
+    color: #F8EEDF;
+    min-width: 44px;
+    background: none;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 8px;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+    background: rgba(142, 22, 22, 0.4);
+    color: #F8EEDF;
+}
+
+.react-calendar__month-view__weekdays {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.75em;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none;
 }
 
 .react-calendar__tile {
-  max-width: 100%;
-  padding: 10px 6.6667px;
-  background: none;
-  text-align: center;
-  line-height: 16px;
-  color: black; /* Changed date text color to black */
-  border-radius: 6px;
-  border: none;
+    max-width: 100%;
+    padding: 10px 6.6667px;
+    background: none;
+    text-align: center;
+    line-height: 16px;
+    color: #F8EEDF;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+    background: rgba(142, 22, 22, 0.8);
+    color: #F8EEDF;
+    border-radius: 8px;
 }
 
 .react-calendar__tile--now {
-  background: #e6f7ff;
-  border-radius: 6px;
-  color: black; /* Ensure current date is black */
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #F8EEDF;
+    font-weight: 700;
 }
 
-.react-calendar__tile--active {
-  background: #1890ff;
-  border-radius: 6px;
-  color: white;
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+    background: rgba(142, 22, 22, 0.9);
+}
+
+.react-calendar__tile--active,
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+    background: #8E1616;
+    border-radius: 8px;
+    color: #F8EEDF;
 }
 
 .react-calendar__tile--disabled {
-  background: #f0f0f0;
-  color: #d6d6d6;
-}
-
-.react-calendar__tile--hover {
-  background: #f0f0f0;
-  color: black; /* Ensure hover text is black */
+    background: transparent;
+    color: rgba(255, 255, 255, 0.2);
 }
 
 .react-calendar__month-view__days__day--weekend {
-  color: black; /* Changed weekend dates to black */
+    color: #F8EEDF;
+}
+
+/* Custom Time Picker Styles */
+.time-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for time picker */
+.time-picker::-webkit-scrollbar {
+    width: 5px;
+}
+
+.time-picker::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.time-picker::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+}
+
+.time-picker::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.time-slot-btn {
+    background: #000;
+    color: #F8EEDF;
+    border: 1.5px solid #000;
+    border-radius: 30px;
+    padding: 0.7rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    width: 100%;
+    text-align: center;
+}
+
+.time-slot-btn:hover {
+    background: #8E1616;
+    border-color: #8E1616;
+    color: #F8EEDF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(142, 22, 22, 0.25);
+}
+
+.time-slot-btn--selected {
+    background: #8E1616 !important;
+    border-color: #8E1616 !important;
+    color: #F8EEDF !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(142, 22, 22, 0.25);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -623,8 +718,15 @@
 
 /* ── keyframes ─────────────────────────────────────────────── */
 @keyframes dropIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── page wrapper ──────────────────────────────────────────── */
@@ -769,10 +871,22 @@
     scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }
 
-.shop-grid-wrapper::-webkit-scrollbar { width: 5px; }
-.shop-grid-wrapper::-webkit-scrollbar-track { background: transparent; }
-.shop-grid-wrapper::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 999px; }
-.shop-grid-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
+.shop-grid-wrapper::-webkit-scrollbar {
+    width: 5px;
+}
+
+.shop-grid-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.shop-grid-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+}
+
+.shop-grid-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
 
 .shop-empty {
     text-align: center;
@@ -794,8 +908,13 @@
 
 /* ── responsive ────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-    .shop-grid     { grid-template-columns: repeat(2, 1fr); }
-    .shop-grid--full { grid-template-columns: repeat(3, 1fr); }
+    .shop-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .shop-grid--full {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
@@ -822,6 +941,7 @@
 }
 
 @media (max-width: 480px) {
+
     .shop-grid,
     .shop-grid--full {
         grid-template-columns: repeat(2, 1fr);

@@ -1,110 +1,166 @@
+/* src/components/HomeAbout.css */
+
+:root {
+    --ha-bg: #8B1A1A;
+    /* Deep crimson/dark red */
+    --ha-headline: #FFFFFF;
+    --ha-accent: #E8C999;
+    /* Warm cream/gold color */
+    --ha-body-text: rgba(248, 238, 223, 0.85);
+    /* Light off-white */
+}
+
 /* ── Section ───────────────────────────────────────────────── */
-.home-about {
+.ha-section {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5rem;
-    padding: 6rem 4rem 7rem;
-    background: #8E1616;
+    padding: 3rem 4rem 4rem;
+    background-color: var(--ha-bg);
     overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* ── Stacked Photos ────────────────────────────────────────── */
-.home-about__images {
+/* ── Stacked Photos (Stage) ────────────────────────────────── */
+.ha-card-stage {
     position: relative;
     flex-shrink: 0;
-    width: 340px;
-    height: 380px;
+    width: 420px;
+    height: 480px;
+    perspective: 1000px;
+    /* For 3D tilt */
+    cursor: pointer;
 }
 
-.home-about__img {
+/* ── Photo Cards ───────────────────────────────────────────── */
+.ha-card {
     position: absolute;
-    width: 260px;
-    height: 300px;
+    top: 50%;
+    left: 50%;
+    margin-top: -190px;
+    margin-left: -150px;
+    width: 300px;
+    height: 380px;
+    background: #fff;
+    border: 6px solid #fff;
+    /* White border */
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.ha-card-img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    display: block;
 }
 
-/* Back photo: tilted left, shifted up */
-.home-about__img--back {
-    top: 0;
-    left: 0;
-    transform: rotate(-5deg);
-    z-index: 1;
+/* Inner Shine effect */
+.ha-card-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0.05) 40%,
+            rgba(255, 255, 255, 0) 100%);
+    z-index: 10;
+    pointer-events: none;
 }
 
-/* Front photo: tilted right, shifted down-right */
-.home-about__img--front {
-    bottom: 0;
-    right: 0;
-    transform: rotate(4deg);
-    z-index: 2;
+/* ── Tap Hint ──────────────────────────────────────────────── */
+.ha-tap-hint {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--ha-accent);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+    pointer-events: none;
+    font-weight: 600;
 }
 
-/* ── Text ──────────────────────────────────────────────────── */
-.home-about__text {
+/* ── Text Side ─────────────────────────────────────────────── */
+.ha-text-block {
     flex: 1;
-    color: #F8EEDF;
-    max-width: 480px;
+    max-width: 500px;
 }
 
-.home-about__headline {
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+.ha-headline {
+    font-size: clamp(2.2rem, 4vw, 3.2rem);
     font-weight: 900;
     line-height: 1.15;
-    margin: 0 0 1.2rem;
-    color: #F8EEDF;
+    margin: 0 0 1.5rem;
+    color: var(--ha-headline);
 }
 
-.home-about__body {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: rgba(248, 238, 223, 0.8);
-    margin: 0 0 2rem;
+.ha-body {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--ha-body-text);
+    margin: 0 0 2.5rem;
 }
 
-.home-about__body strong {
-    color: #E8C999;
+.ha-body strong {
+    color: var(--ha-accent);
     font-weight: 700;
 }
 
 /* ── CTA Button ────────────────────────────────────────────── */
-.home-about__btn {
+.ha-btn {
     display: inline-block;
-    padding: 0.85rem 2rem;
-    background: #E8C999;
-    color: #000000;
+    padding: 0.9rem 2.2rem;
+    background: transparent;
+    color: var(--ha-accent);
+    border: 2px solid var(--ha-accent);
     border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: background 0.25s, transform 0.15s;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
-.home-about__btn:hover {
-    background: #a01a1a;
+.ha-btn:hover {
+    background: var(--ha-accent);
+    color: var(--ha-bg);
+    /* Use the dark red background color for contrast */
     transform: translateY(-2px);
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
-@media (max-width: 750px) {
-    .home-about {
+@media (max-width: 768px) {
+    .ha-section {
         flex-direction: column;
-        padding: 4rem 1.5rem 5rem;
-        gap: 3rem;
+        padding: 5rem 1.5rem 6rem;
+        gap: 2rem;
         text-align: center;
     }
 
-    .home-about__images {
-        width: 280px;
-        height: 300px;
+    .ha-card-stage {
+        width: 320px;
+        height: 380px;
     }
 
-    .home-about__img {
-        width: 200px;
-        height: 240px;
+    .ha-card {
+        width: 240px;
+        height: 300px;
+        margin-top: -150px;
+        margin-left: -120px;
+    }
+
+    .ha-text-block {
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 }

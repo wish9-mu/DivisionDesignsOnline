@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './FeaturedProduct.css';
 import hero1 from '../assets/Hero1.png';
 import { useCart } from '../context/CartContext';
+import gsap from 'gsap';
 
 const PRODUCT = {
     id: 'featured-reversible-reds',
@@ -15,6 +16,21 @@ const FeaturedProduct = () => {
     const [qty, setQty] = useState(1);
     const [added, setAdded] = useState(false);
     const { addItem } = useCart();
+    const sectionRef = useRef(null);
+
+    useEffect(() => {
+        let ctx = gsap.context(() => {
+            gsap.fromTo('.featured-redesign__info > *',
+                { opacity: 0, x: -20 },
+                { opacity: 1, x: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out' }
+            );
+            gsap.fromTo('.featured-redesign__image-wrap',
+                { opacity: 0, scale: 0.95 },
+                { opacity: 1, scale: 1, duration: 1, ease: 'power2.inOut' }
+            );
+        }, sectionRef);
+        return () => ctx.revert();
+    }, []);
 
     const decrease = () => setQty((q) => Math.max(1, q - 1));
     const increase = () => setQty((q) => q + 1);
@@ -26,7 +42,7 @@ const FeaturedProduct = () => {
     };
 
     return (
-        <section className="featured-redesign" id="products">
+        <section className="featured-redesign" id="products" ref={sectionRef}>
             <div className="featured-redesign__content">
                 {/* Info (Left) */}
                 <div className="featured-redesign__info">

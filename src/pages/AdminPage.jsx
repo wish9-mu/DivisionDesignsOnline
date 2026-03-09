@@ -469,6 +469,8 @@ const AdminPage = () => {
               pendingCustom={pendingCustom}
               upcomingAppointments={upcomingAppointments}
               badgeClass={badgeClass}
+              appointments={appointments}
+              customOrders={customOrders}
             />
           )}
 

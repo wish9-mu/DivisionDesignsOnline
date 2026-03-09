@@ -187,6 +187,32 @@ const CustomOrdersPage = () => {
     }
   };
 
+  const handleTrack = async () => {
+    if (!trackId.trim()) {
+      alert("Please enter a Reference ID.");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("custom_orders")
+        .select("*")
+        .eq("reference_id", trackId.trim());
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setTrackResult(data[0]);
+      } else {
+        alert("Order not found with the provided Reference ID.");
+        setTrackResult(null);
+      }
+    } catch (err) {
+      console.error("Error fetching order status:", err.message);
+      alert("An error occurred while tracking the order.");
+    }
+  };
+
   return (
     <Layout>
       <div className="page">

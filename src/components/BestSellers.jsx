@@ -13,7 +13,7 @@ const BestSellers = () => {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .in('tag', ['Bestseller', 'Featured', 'Custom', 'Premium'])
+        .in('name', ['The Minimalist', 'Mapua Baybayin Red', 'Karudinal - Comsci'])
         .not('image_url', 'is', null)
         .neq('image_url', '')
         .limit(3); // Changed to 3 for the new layout

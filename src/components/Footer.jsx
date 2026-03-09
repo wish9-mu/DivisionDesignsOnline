@@ -149,10 +149,6 @@ const Footer = () => {
               divisiondesigns@gmail.com
             </div>
             <div className="footer__contact-item">
-              <span>Phone</span>
-              +63 XXX XXX XXXX
-            </div>
-            <div className="footer__contact-item">
               <span>Location</span>
               Metro Manila, Philippines
             </div>

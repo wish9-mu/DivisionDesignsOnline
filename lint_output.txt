@@ -1,0 +1,50 @@
+
+> division-designs@0.0.0 lint
+> eslint .
+
+
+C:\Users\Reese\Documents\DivisionDesigns\src\components\admin\AdminCustomOrders.jsx
+  7:3  error  'badgeClass' is defined but never used  no-unused-vars
+
+C:\Users\Reese\Documents\DivisionDesigns\src\components\admin\AdminDashboard.jsx
+  59:127  error  'customOrders' is assigned a value but never used  no-unused-vars
+
+C:\Users\Reese\Documents\DivisionDesigns\src\components\admin\AdminOrders.jsx
+  17:28  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks
+
+C:\Users\Reese\Documents\DivisionDesigns\src\context\AuthContext.jsx
+  92:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Reese\Documents\DivisionDesigns\src\context\CartContext.jsx
+  63:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\Reese\Documents\DivisionDesigns\src\pages\AdminPage.jsx
+  141:7   error  'normalizeStatus' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  154:25  error  'setLoadingOrders' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u        no-unused-vars
+  155:31  error  'setLoadingCustomOrders' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  156:31  error  'setLoadingAppointments' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Reese\Documents\DivisionDesigns\src\pages\CustomOrdersPage.jsx
+   76:59  error  'e' is defined but never used                                                                     no-unused-vars
+   76:62  error  Empty block statement                                                                             no-empty
+  167:9   error  'formatDateString' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Reese\Documents\DivisionDesigns\src\pages\ResetPasswordPage.jsx
+  67:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  65 |         });
+  66 |     } else {
+> 67 |       setError("Invalid or expired reset link. Please request a new one.");
+     |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  68 |     }
+  69 |
+  70 |     return () => ctx.revert();  react-hooks/set-state-in-effect
+
+✖ 13 problems (13 errors, 0 warnings)
+

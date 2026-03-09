@@ -35,19 +35,19 @@
 }
 
 .admin__stat-card:nth-child(2)::after {
-    background: #E8C999;
+    background: #7D3AC1;
 }
 
 .admin__stat-card:nth-child(3)::after {
-    background: #1a6b3a;
+    background: #EB848C;
 }
 
 .admin__stat-card:nth-child(4)::after {
-    background: #2563eb;
+    background: #8E1616;
 }
 
 .admin__stat-card:nth-child(5)::after {
-    background: #7c3aed;
+    background: #AF4BCE;
 }
 
 .admin__stat-value {

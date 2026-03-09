@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { Package } from 'lucide-react';
 import './CartSidebar.css';
 
 const CartSidebar = () => {
@@ -26,6 +27,33 @@ const CartSidebar = () => {
                     >
                         ✕
                     </button>
+                </div>
+
+                {/* Purchases Link Header */}
+                <div style={{ padding: '0 1.5rem', marginBottom: '1rem', marginTop: '-0.5rem' }}>
+                    <Link
+                        to="/purchases"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            width: '100%',
+                            padding: '0.75rem',
+                            background: '#f9fafb',
+                            color: '#000',
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '8px',
+                            textDecoration: 'none',
+                            fontWeight: '600',
+                            fontSize: '0.9rem',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onClick={() => setOpen(false)}
+                    >
+                        <Package size={18} />
+                        View Purchases
+                    </Link>
                 </div>
 
                 {/* Items */}
@@ -88,13 +116,16 @@ const CartSidebar = () => {
                             <span>Estimated Total</span>
                             <span>₱{total.toFixed(2)}</span>
                         </div>
-                        <Link
-                            to="/order-forms"
-                            className="cart-sidebar__checkout-btn"
-                            onClick={() => setOpen(false)}
-                        >
-                            Checkout
-                        </Link>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                            <Link
+                                to="/order-forms"
+                                className="cart-sidebar__checkout-btn"
+                                style={{ flex: 1, textAlign: 'center' }}
+                                onClick={() => setOpen(false)}
+                            >
+                                Checkout
+                            </Link>
+                        </div>
                     </div>
                 )}
             </aside>

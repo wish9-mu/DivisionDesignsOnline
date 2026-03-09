@@ -30,7 +30,10 @@ const ProfilePage = () => {
   const memberSince = useMemo(() => {
     const created = user?.created_at ? new Date(user.created_at) : null;
     return created
-      ? created.toLocaleDateString(undefined, { month: "long", year: "numeric" })
+      ? created.toLocaleDateString(undefined, {
+          month: "long",
+          year: "numeric",
+        })
       : "";
   }, [user]);
 
@@ -39,7 +42,7 @@ const ProfilePage = () => {
     if (name) {
       const parts = name.split(/\s+/);
       const a = parts[0]?.[0] ?? "";
-      const b = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
+      const b = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
       return (a + b).toUpperCase() || "DD";
     }
     return ((email?.[0] ?? "D") + "D").toUpperCase();
@@ -55,7 +58,7 @@ const ProfilePage = () => {
       const { data: p, error: pErr } = await supabase
         .from("profiles")
         .select(
-          "username, first_name, last_name, full_name, contact_number, organization, delivery_address"
+          "username, first_name, last_name, full_name, contact_number, organization, delivery_address",
         )
         .eq("id", user.id)
         .maybeSingle();
@@ -88,7 +91,7 @@ const ProfilePage = () => {
             full_name: fullName ?? "",
             updated_at: new Date().toISOString(),
           },
-          { onConflict: "id" }
+          { onConflict: "id" },
         );
       }
 
@@ -114,22 +117,20 @@ const ProfilePage = () => {
       ? profile.full_name.trim()
       : `${profile.first_name} ${profile.last_name}`.trim();
 
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: user.id,
-          username: profile.username,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          full_name: fullName,
-          contact_number: profile.contact_number || null,
-          organization: profile.organization || null,
-          delivery_address: profile.delivery_address || null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "id" }
-      );
+    const { error } = await supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        username: profile.username,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        full_name: fullName,
+        contact_number: profile.contact_number || null,
+        organization: profile.organization || null,
+        delivery_address: profile.delivery_address || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" },
+    );
 
     if (error) return alert(error.message);
 
@@ -200,7 +201,9 @@ const ProfilePage = () => {
                   <>
                     <div className="profile-row">
                       <span className="profile-label">Name</span>
-                      <span className="profile-value">{profile.full_name || "—"}</span>
+                      <span className="profile-value">
+                        {profile.full_name || "—"}
+                      </span>
                     </div>
                     <div className="profile-row">
                       <span className="profile-label">Email</span>
@@ -208,11 +211,15 @@ const ProfilePage = () => {
                     </div>
                     <div className="profile-row">
                       <span className="profile-label">Contact</span>
-                      <span className="profile-value">{profile.contact_number || "—"}</span>
+                      <span className="profile-value">
+                        {profile.contact_number || "—"}
+                      </span>
                     </div>
                     <div className="profile-row">
                       <span className="profile-label">Member Since</span>
-                      <span className="profile-value">{memberSince || "—"}</span>
+                      <span className="profile-value">
+                        {memberSince || "—"}
+                      </span>
                     </div>
                     <div className="profile-row">
                       <span className="profile-label">Total Orders</span>
@@ -222,9 +229,20 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              <button className="page__cta-btn" onClick={() => setActiveTab("Edit Profile")}>
-                Edit Profile
-              </button>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  justifyContent: "center",
+                }}
+              >
+                <button
+                  className="page__cta-btn"
+                  onClick={() => setActiveTab("Edit Profile")}
+                >
+                  Edit Profile
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -237,7 +255,9 @@ const ProfilePage = () => {
                 <input
                   type="text"
                   value={profile.username}
-                  onChange={(e) => setProfile((p) => ({ ...p, username: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, username: e.target.value }))
+                  }
                 />
               </div>
               <div className="form-group">
@@ -252,7 +272,9 @@ const ProfilePage = () => {
                 <input
                   type="text"
                   value={profile.first_name}
-                  onChange={(e) => setProfile((p) => ({ ...p, first_name: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, first_name: e.target.value }))
+                  }
                 />
               </div>
               <div className="form-group">
@@ -260,7 +282,9 @@ const ProfilePage = () => {
                 <input
                   type="text"
                   value={profile.last_name}
-                  onChange={(e) => setProfile((p) => ({ ...p, last_name: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, last_name: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -270,7 +294,9 @@ const ProfilePage = () => {
               <input
                 type="text"
                 value={profile.full_name}
-                onChange={(e) => setProfile((p) => ({ ...p, full_name: e.target.value }))}
+                onChange={(e) =>
+                  setProfile((p) => ({ ...p, full_name: e.target.value }))
+                }
               />
             </div>
 
@@ -280,7 +306,12 @@ const ProfilePage = () => {
                 <input
                   type="tel"
                   value={profile.contact_number}
-                  onChange={(e) => setProfile((p) => ({ ...p, contact_number: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({
+                      ...p,
+                      contact_number: e.target.value,
+                    }))
+                  }
                 />
               </div>
               <div className="form-group">
@@ -289,7 +320,9 @@ const ProfilePage = () => {
                   type="text"
                   placeholder="Your school or org"
                   value={profile.organization}
-                  onChange={(e) => setProfile((p) => ({ ...p, organization: e.target.value }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, organization: e.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -300,18 +333,31 @@ const ProfilePage = () => {
                 type="text"
                 placeholder="Street, City, Province"
                 value={profile.delivery_address}
-                onChange={(e) => setProfile((p) => ({ ...p, delivery_address: e.target.value }))}
+                onChange={(e) =>
+                  setProfile((p) => ({
+                    ...p,
+                    delivery_address: e.target.value,
+                  }))
+                }
               />
             </div>
 
             <div className="form-row">
               <div className="form-group">
                 <label>New Password</label>
-                <input type="password" placeholder="Leave blank to keep current" disabled />
+                <input
+                  type="password"
+                  placeholder="Leave blank to keep current"
+                  disabled
+                />
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
-                <input type="password" placeholder="Repeat new password" disabled />
+                <input
+                  type="password"
+                  placeholder="Repeat new password"
+                  disabled
+                />
               </div>
             </div>
 

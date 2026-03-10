@@ -5,11 +5,23 @@ import { supabase } from "../supabaseClient";
 import "react-calendar/dist/Calendar.css";
 import Calendar from "react-calendar";
 import { useAuth } from "../context/AuthContext";
+import { useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { Loader2, CalendarDays, SearchX } from "lucide-react";
 
 const CustomOrdersPage = () => {
   const [activeTab, setActiveTab] = useState("Submit Request");
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersTab, setOrdersTab] = useState("Recent Purchases");
+  const location = useLocation();
+
+  // Auto-select tab from URL query param e.g. ?tab=purchase-history
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get("tab");
+    if (tab === "purchase-history") setActiveTab("Purchase History");
+  }, [location.search]);
   const [trackId, setTrackId] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [appointments, setAppointments] = useState([]);
@@ -105,6 +117,22 @@ const CustomOrdersPage = () => {
     };
 
     fetchUserOrders();
+  }, [user]);
+
+  // Fetch regular orders for Purchase History tab
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchOrders = async () => {
+      setOrdersLoading(true);
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (!error) setOrders(data || []);
+      setOrdersLoading(false);
+    };
+    fetchOrders();
   }, [user]);
 
   const saveLookup = (order) => {
@@ -505,7 +533,7 @@ const CustomOrdersPage = () => {
       )}
       <div className="page page--tracking">
         <div className="page__tabs">
-          {["Submit Request", "Track Status"].map((tab) => (
+          {["Submit Request", "Track Status", "Purchase History"].map((tab) => (
             <button
               key={tab}
               className={`page__tab${activeTab === tab ? " page__tab--active" : ""
@@ -953,8 +981,146 @@ const CustomOrdersPage = () => {
             </div>
           </div>
         )}
+
+        {activeTab === "Purchase History" && (
+          <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+            {!user ? (
+              <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#f9fafb', borderRadius: '12px' }}>
+                <h3>Sign in to view your purchases</h3>
+                <p style={{ color: '#6b7280', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+                  You need to be logged in to see your order history.
+                </p>
+                <button className="page__cta-btn" onClick={() => window.location.href = '/DivisionDesigns/sign-in'}>
+                  Sign In
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Sub-tabs */}
+                <div className="page__tabs" style={{ marginBottom: '1.5rem' }}>
+                  {["Recent Purchases", "Completed Purchases"].map((tab) => (
+                    <button
+                      key={tab}
+                      className={`page__tab${ordersTab === tab ? " page__tab--active" : ""}`}
+                      onClick={() => setOrdersTab(tab)}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {ordersLoading ? (
+                  <p style={{ textAlign: 'center', marginTop: '2rem' }}>Loading orders...</p>
+                ) : (() => {
+                  const displayed = orders.filter(o =>
+                    ordersTab === "Completed Purchases"
+                      ? o.status === "Completed" || o.status === "Delivered"
+                      : o.status !== "Completed" && o.status !== "Delivered"
+                  );
+
+                  if (displayed.length === 0) {
+                    return (
+                      <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#f9fafb', borderRadius: '12px' }}>
+                        <h3>No {ordersTab.toLowerCase()} found</h3>
+                        <p style={{ color: '#6b7280', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+                          {ordersTab === "Recent Purchases"
+                            ? "You don't have any active orders right now."
+                            : "You don't have any completed orders yet."}
+                        </p>
+                        <button className="page__cta-btn" onClick={() => window.location.href = '/DivisionDesigns/products'}>
+                          Start Shopping
+                        </button>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {displayed.map((order) => (
+                        <div
+                          key={order.id}
+                          style={{
+                            border: '1px solid #e5e7eb',
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                            overflow: 'hidden',
+                            backgroundColor: '#fff'
+                          }}
+                        >
+                          {/* Order header */}
+                          <div style={{
+                            borderBottom: '1px solid #e5e7eb',
+                            padding: '1rem 1.5rem',
+                            backgroundColor: '#f9fafb',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '1rem'
+                          }}>
+                            <div>
+                              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0, fontWeight: 500 }}>ORDER PLACED</p>
+                              <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>
+                                {new Date(order.order_date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
+                            </div>
+                            <div>
+                              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0, fontWeight: 500 }}>TOTAL</p>
+                              <p style={{ margin: '0.25rem 0 0', fontWeight: 600 }}>₱{Number(order.total_amount).toFixed(2)}</p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0, fontWeight: 500 }}>
+                                ORDER # {order.order_code}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Order body */}
+                          <div style={{ padding: '1.5rem' }}>
+                            <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              Status:
+                              <span style={{
+                                fontSize: '0.875rem',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '999px',
+                                fontWeight: '600',
+                                backgroundColor:
+                                  order.status === 'Completed' || order.status === 'Delivered' ? '#dcfce7' :
+                                    order.status === 'Cancelled' ? '#fee2e2' :
+                                      order.status === 'Paid' ? '#dbeafe' : '#fef9c3',
+                                color:
+                                  order.status === 'Completed' || order.status === 'Delivered' ? '#166534' :
+                                    order.status === 'Cancelled' ? '#991b1b' :
+                                      order.status === 'Paid' ? '#1e40af' : '#854d0e',
+                              }}>
+                                {order.status || 'Pending'}
+                              </span>
+                            </h3>
+                            <div style={{ marginTop: '1rem' }}>
+                              <p style={{ margin: 0, fontWeight: '600', color: '#374151' }}>Items:</p>
+                              <p style={{ margin: '0.5rem 0 0', color: '#4b5563', lineHeight: '1.5' }}>{order.items_summary}</p>
+                            </div>
+                            <div style={{ marginTop: '1.5rem' }}>
+                              <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+                                <strong>Payment Method:</strong> {order.payment_method}
+                              </p>
+                              <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: '#6b7280' }}>
+                                <strong>Shipping Address:</strong> {order.shipping_address}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </Layout>
+
   );
 };
 

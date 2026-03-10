@@ -32,7 +32,7 @@ const CartSidebar = () => {
                 {/* Purchases Link Header */}
                 <div style={{ padding: '0 1.5rem', marginBottom: '1rem', marginTop: '-0.5rem' }}>
                     <Link
-                        to="/purchases"
+                        to="/custom-orders?tab=purchase-history"
                         style={{
                             display: 'flex',
                             alignItems: 'center',

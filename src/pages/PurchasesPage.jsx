@@ -51,12 +51,12 @@ const PurchasesPage = () => {
             <div className="page">
                 <div className="page__header">
                     <p className="page__eyebrow">Purchases</p>
-                    <h1 className="page__title">Order History</h1>
+                    <h1 className="page__title">Purchase History</h1>
                     <p className="page__subtitle">Track your recent purchases and view completed orders.</p>
                 </div>
 
                 <div className="page__tabs">
-                    {["Recent Orders", "Completed Orders"].map((tab) => (
+                    {["Recent Purchases", "Completed Purchases"].map((tab) => (
                         <button
                             key={tab}
                             className={`page__tab${activeTab === tab ? " page__tab--active" : ""}`}

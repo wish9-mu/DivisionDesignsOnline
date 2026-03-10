@@ -239,3 +239,44 @@
     display: none;
     /* override global button back layer */
 }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .community-reel {
+        padding: 1.5rem 0;
+    }
+
+    .community-reel__title {
+        font-size: 2rem;
+    }
+
+    .community-reel__subtitle {
+        font-size: 1rem;
+    }
+
+    .community-reel__body {
+        font-size: 0.9rem;
+    }
+
+    .community-reel__track-wrapper {
+        padding-left: 1rem;
+    }
+
+    .community-reel__card-wrapper {
+        width: 220px;
+    }
+}
+
+@media (max-width: 480px) {
+    .community-reel__title {
+        font-size: 1.7rem;
+    }
+
+    .community-reel__card-wrapper {
+        width: 180px;
+    }
+
+    .community-reel__track-wrapper {
+        padding-left: 0.75rem;
+    }
+}

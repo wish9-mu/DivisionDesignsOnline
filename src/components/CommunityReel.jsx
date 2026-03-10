@@ -8,8 +8,8 @@ import { supabase } from "../supabaseClient";
 const REEL_DATA = [
   {
     id: 1,
-    mediaUrl: "",
-    mediaType: "image",
+    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO1.MOV",
+    mediaType: "video",
     username: "jane_doe",
     platform: "Instagram",
     caption: "Repping my college colors 🎓",
@@ -17,8 +17,8 @@ const REEL_DATA = [
   },
   {
     id: 2,
-    mediaUrl: "",
-    mediaType: "image",
+    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO3.MOV",
+    mediaType: "video",
     username: "alex_campus",
     platform: "TikTok",
     caption: "Must have for everyday wear 💯",
@@ -26,58 +26,33 @@ const REEL_DATA = [
   },
   {
     id: 3,
-    mediaUrl: "",
-    mediaType: "image",
+    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO4.MOV",
+    mediaType: "video",
     username: "marky_m",
     platform: "Instagram",
-    caption: "Graduation ready! 📸",
+    caption: "Style up",
     productId: "b5c34d02-2345-6789-abcd-ef0123456789",
   },
   {
     id: 4,
-    mediaUrl: "",
-    mediaType: "image",
-    username: "sophia.studies",
-    platform: "TikTok",
-    caption: "Library vibes books + division designs",
-    productId: "c6d45e13-3456-7890-bcde-f0123456789a",
+    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO2.MOV",
+    mediaType: "video",
+    username: "marky_m",
+    platform: "Instagram",
+    caption: "Styling with this lanyards",
+    productId: "b5c34d02-2345-6789-abcd-ef0123456789",
   },
   {
     id: 5,
-    mediaUrl: "",
-    mediaType: "image",
-    username: "kyle_cruz",
+    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO5.MOV",
+    mediaType: "video",
+    username: "xluwish",
     platform: "Instagram",
-    caption: "Matchy matchy with the org 🤝",
-    productId: "d7e56f24-4567-8901-cdef-0123456789ab",
+    caption: "📸",
+    productId: "b5c34d02-2345-6789-abcd-ef0123456789",
   },
-  {
-    id: 6,
-    mediaUrl: "",
-    mediaType: "image",
-    username: "bea_alv",
-    platform: "TikTok",
-    caption: "Campus strolls 🤍",
-    productId: "e8f67035-5678-9012-def0-123456789abc",
-  },
-  {
-    id: 7,
-    mediaUrl: "",
-    mediaType: "image",
-    username: "timothy_s",
-    platform: "Instagram",
-    caption: "Class gear check 🎒",
-    productId: "f9078146-6789-0123-ef01-23456789abcd",
-  },
-  {
-    id: 8,
-    mediaUrl: "",
-    mediaType: "image",
-    username: "gabyyyy",
-    platform: "TikTok",
-    caption: "Best aesthetic lanyards!",
-    productId: "0a189257-7890-1234-f012-3456789abcde",
-  },
+
+
 ];
 
 const ITEM_WIDTH = 300; // Includes gap (280px width + 20px gap)
@@ -190,13 +165,23 @@ const CommunityReel = () => {
                   style={{ position: "relative" }}
                 >
                   <div className="community-reel__card">
-                    {item.mediaUrl && (
+                    {item.mediaUrl && item.mediaType === "video" ? (
+                      <video
+                        src={item.mediaUrl}
+                        className="community-reel__video-thumb"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : item.mediaUrl ? (
                       <img
                         src={item.mediaUrl}
                         alt="User Content"
                         className="community-reel__video-thumb"
                       />
-                    )}
+                    ) : null}
                     <div className="community-reel__overlay" />
                     <div className="community-reel__mute-icon">
                       <VolumeX size={16} color="#fff" strokeWidth={2.5} />

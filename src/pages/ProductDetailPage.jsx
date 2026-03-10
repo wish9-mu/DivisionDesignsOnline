@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../supabaseClient";
 import { accordionSections } from "../data/accordionData";
-import { parseProductImages } from "../utils/imageUtils";
+import { parseProductImages, getProductPrimaryImage } from "../utils/imageUtils";
 import SuggestedProducts from "../components/SuggestedProducts";
 import "./ProductDetailPage.css";
 
@@ -111,6 +111,7 @@ const ProductDetailPage = () => {
   const handleAddToCart = () => {
     addItem({
       ...product,
+      image_url: getProductPrimaryImage(product),
       category: product.type,
       qty,
     });
@@ -128,8 +129,8 @@ const ProductDetailPage = () => {
   const avgRating =
     reviews.length > 0
       ? (
-          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-        ).toFixed(2)
+        reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      ).toFixed(2)
       : 0;
 
   const ratingCounts = [5, 4, 3, 2, 1].map(
@@ -171,9 +172,8 @@ const ProductDetailPage = () => {
                 {productImages.map((imgUrl, i) => (
                   <button
                     key={i}
-                    className={`pdp-gallery__thumb${
-                      selectedImage === i ? " pdp-gallery__thumb--active" : ""
-                    }`}
+                    className={`pdp-gallery__thumb${selectedImage === i ? " pdp-gallery__thumb--active" : ""
+                      }`}
                     onClick={() => setSelectedImage(i)}
                   >
                     <img
@@ -286,9 +286,8 @@ const ProductDetailPage = () => {
               {accordionSections.map((section, i) => (
                 <div
                   key={i}
-                  className={`pdp-accordion${
-                    openAccordion === i ? " pdp-accordion--open" : ""
-                  }`}
+                  className={`pdp-accordion${openAccordion === i ? " pdp-accordion--open" : ""
+                    }`}
                 >
                   <button
                     className="pdp-accordion__header"

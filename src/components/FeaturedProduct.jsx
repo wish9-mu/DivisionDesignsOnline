@@ -9,7 +9,7 @@ const PRODUCT = {
     name: 'Reversible Reds',
     category: 'Reversible Lanyards',
     price: 210,
-    image: hero1,
+    image_url: hero1,
 };
 
 const FeaturedProduct = () => {

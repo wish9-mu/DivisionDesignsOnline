@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../components/Layout";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../supabaseClient";
+import { getProductPrimaryImage } from "../utils/imageUtils";
 import FilterSidebar from "../components/FilterSidebar";
 import ShopCard from "../components/ShopCard";
 import "./PageStyles.css";
@@ -58,24 +59,24 @@ const fallbackProducts = [
 ];
 
 const SORT_OPTIONS = [
-  { label: "Newest",          value: "newest"    },
+  { label: "Newest", value: "newest" },
   { label: "Price: Low–High", value: "price-asc" },
   { label: "Price: High–Low", value: "price-desc" },
-  { label: "Name: A–Z",       value: "name-asc"  },
+  { label: "Name: A–Z", value: "name-asc" },
 ];
 
-const CATEGORIES  = ["All", "Standard Lanyards", "Custom Lanyards"];
-const TAGS        = ["All", "Premium", "Custom", "Bestseller", "Featured"];
+const CATEGORIES = ["All", "Standard Lanyards", "Custom Lanyards"];
+const TAGS = ["All", "Premium", "Custom", "Bestseller", "Featured"];
 const AVAILABILITY = ["All", "In Stock", "Out of Stock"];
 
 const ProductsPage = () => {
-  const [products,           setProducts]           = useState(fallbackProducts);
-  const [activeCategory,     setActiveCategory]     = useState("All");
-  const [activeTag,          setActiveTag]          = useState("All");
+  const [products, setProducts] = useState(fallbackProducts);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeTag, setActiveTag] = useState("All");
   const [activeAvailability, setActiveAvailability] = useState("All");
-  const [sortBy,             setSortBy]             = useState("newest");
-  const [sortOpen,           setSortOpen]           = useState(false);
-  const [filtersVisible,     setFiltersVisible]     = useState(true);
+  const [sortBy, setSortBy] = useState("newest");
+  const [sortOpen, setSortOpen] = useState(false);
+  const [filtersVisible, setFiltersVisible] = useState(true);
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -105,9 +106,9 @@ const ProductsPage = () => {
       result = result.filter((p) => p.stock !== undefined && p.stock <= 0);
 
     switch (sortBy) {
-      case "price-asc":  result.sort((a, b) => a.price - b.price);               break;
-      case "price-desc": result.sort((a, b) => b.price - a.price);               break;
-      case "name-asc":   result.sort((a, b) => a.name.localeCompare(b.name));    break;
+      case "price-asc": result.sort((a, b) => a.price - b.price); break;
+      case "price-desc": result.sort((a, b) => b.price - a.price); break;
+      case "name-asc": result.sort((a, b) => a.name.localeCompare(b.name)); break;
       default: break;
     }
 
@@ -120,7 +121,7 @@ const ProductsPage = () => {
   const handleAddToCart = (product) => {
     addItem({
       ...product,
-      image: product.image_url,
+      image_url: getProductPrimaryImage(product),
       category: product.type,
       qty: 1,
     });
@@ -149,9 +150,9 @@ const ProductsPage = () => {
                 fill="none" stroke="currentColor"
                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
               >
-                <line x1="4"  y1="6"  x2="20" y2="6"  />
-                <line x1="4"  y1="12" x2="14" y2="12" />
-                <line x1="4"  y1="18" x2="10" y2="18" />
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="14" y2="12" />
+                <line x1="4" y1="18" x2="10" y2="18" />
               </svg>
             </button>
 

@@ -38,48 +38,51 @@ const OrderFormsPage = () => {
                 Math.floor(Math.random() * 1e6)
             ).padStart(6, '0')}`;
 
-            // Subtract stock for each item in the cart
-            const updatePromises = items.map(async (item) => {
-                let productId = item.id;
+            // For Paymongo: stock is deducted by the webhook on payment confirmation.
+            // For other methods (COD, Bank Transfer): deduct immediately.
+            if (form.paymentMethod !== 'Paymongo') {
+                const updatePromises = items.map(async (item) => {
+                    let productId = item.id;
 
-                // Some cart items can come from old/static IDs (e.g. slugs or p1/p2).
-                // Resolve the real DB UUID first, then update stock by UUID.
-                if (!isUuid(productId)) {
-                    const { data: resolvedProduct, error: resolveError } = await supabase
-                        .from('products')
-                        .select('id, stock')
-                        .eq('name', item.name)
-                        .maybeSingle();
+                    // Some cart items can come from old/static IDs (e.g. slugs or p1/p2).
+                    // Resolve the real DB UUID first, then update stock by UUID.
+                    if (!isUuid(productId)) {
+                        const { data: resolvedProduct, error: resolveError } = await supabase
+                            .from('products')
+                            .select('id, stock')
+                            .eq('name', item.name)
+                            .maybeSingle();
 
-                    if (resolveError) throw resolveError;
-                    if (!resolvedProduct) {
-                        throw new Error(`Product not found for cart item: ${item.name}`);
+                        if (resolveError) throw resolveError;
+                        if (!resolvedProduct) {
+                            throw new Error(`Product not found for cart item: ${item.name}`);
+                        }
+
+                        productId = resolvedProduct.id;
                     }
 
-                    productId = resolvedProduct.id;
-                }
+                    // Fetch current stock to ensure we don't go below 0
+                    const { data: productData, error: fetchError } = await supabase
+                        .from('products')
+                        .select('stock')
+                        .eq('id', productId)
+                        .single();
 
-                // Fetch current stock to ensure we don't go below 0
-                const { data: productData, error: fetchError } = await supabase
-                    .from('products')
-                    .select('stock')
-                    .eq('id', productId)
-                    .single();
+                    if (fetchError) throw fetchError;
 
-                if (fetchError) throw fetchError;
+                    const newStock = Math.max(0, productData.stock - item.qty);
 
-                const newStock = Math.max(0, productData.stock - item.qty);
+                    // Update stock in Supabase
+                    const { error: updateError } = await supabase
+                        .from('products')
+                        .update({ stock: newStock })
+                        .eq('id', productId);
 
-                // Update stock in Supabase
-                const { error: updateError } = await supabase
-                    .from('products')
-                    .update({ stock: newStock })
-                    .eq('id', productId);
+                    if (updateError) throw updateError;
+                });
 
-                if (updateError) throw updateError;
-            });
-
-            await Promise.all(updatePromises);
+                await Promise.all(updatePromises);
+            }
 
             const itemsSummary = items
                 .map((item) => `${item.name} x${item.qty}`)
@@ -120,7 +123,7 @@ const OrderFormsPage = () => {
                         customer_name: form.fullName,
                         customer_email: form.email,
                         success_url: `${window.location.origin}${import.meta.env.BASE_URL}success`,
-                        cancel_url: `${window.location.origin}${import.meta.env.BASE_URL}cancel`
+                        cancel_url: `${window.location.origin}${import.meta.env.BASE_URL}cancel?order_code=${orderCode}`
                     }
                 });
 

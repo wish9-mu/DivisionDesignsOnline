@@ -136,8 +136,16 @@ const PurchasesPage = () => {
                                                 fontSize: '0.875rem',
                                                 padding: '0.25rem 0.75rem',
                                                 borderRadius: '999px',
-                                                backgroundColor: order.status === 'Completed' || order.status === 'Delivered' ? '#dcfce7' : '#fef9c3',
-                                                color: order.status === 'Completed' || order.status === 'Delivered' ? '#166534' : '#854d0e',
+                                                backgroundColor:
+                                                    order.status === 'Completed' || order.status === 'Delivered' ? '#dcfce7' :
+                                                        order.status === 'Cancelled' ? '#fee2e2' :
+                                                            order.status === 'Paid' ? '#dbeafe' :
+                                                                '#fef9c3',
+                                                color:
+                                                    order.status === 'Completed' || order.status === 'Delivered' ? '#166534' :
+                                                        order.status === 'Cancelled' ? '#991b1b' :
+                                                            order.status === 'Paid' ? '#1e40af' :
+                                                                '#854d0e',
                                                 fontWeight: '600'
                                             }}>
                                                 {order.status || 'Pending'}

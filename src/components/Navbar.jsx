@@ -248,7 +248,7 @@ const Navbar = () => {
             <Link to="/about" onClick={() => setMobileMenuOpen(false)}>About</Link>
           </li>
           <li>
-            <Link to="/custom-orders" onClick={() => setMobileMenuOpen(false)}>Custom Orders</Link>
+            <Link to="/custom-orders" onClick={() => setMobileMenuOpen(false)}>Orders</Link>
           </li>
           {authReady && isAdmin && (
             <li>

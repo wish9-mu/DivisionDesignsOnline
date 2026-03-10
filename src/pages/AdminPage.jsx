@@ -122,7 +122,12 @@ const ORDER_STATUSES = [
   "Cancelled",
   "Return Or Refund",
 ];
-const CUSTOM_STATUSES = ["Pending Review", "In Progress", "Completed"];
+const CUSTOM_STATUSES = [
+  "Submitted Order/Custom Request",
+  "Pending Review",
+  "In Production",
+  "Completed"
+];
 const APPOINTMENT_STATUSES = [
   "Scheduled",
   "Confirmed",
@@ -159,15 +164,24 @@ const AdminPage = () => {
     const value = String(status ?? "")
       .trim()
       .toLowerCase();
+
+    if (value.includes("submitted") || value.includes("request"))
+      return "Submitted Order/Custom Request";
+
     if (
       value === "pending" ||
       value === "pending review" ||
       value === "for review"
     )
       return "Pending Review";
-    if (value === "in progress" || value === "processing") return "In Progress";
-    if (value === "completed" || value === "done") return "Completed";
-    return status ?? "Pending Review";
+
+    if (value === "in progress" || value === "processing" || value === "in production")
+      return "In Production";
+
+    if (value === "completed" || value === "done" || value.includes("ready") || value.includes("shipped"))
+      return "Completed";
+
+    return "Submitted Order/Custom Request";
   }, []);
 
   const formatDateLabel = useCallback((value) => {
@@ -429,6 +443,8 @@ const AdminPage = () => {
       "Return Or Refund": "review",
       "Pending Review": "review",
       "In Progress": "in-progress",
+      "In Production": "in-progress",
+      "Submitted Order/Custom Request": "pending",
       Completed: "completed",
       Scheduled: "scheduled",
       Confirmed: "confirmed",

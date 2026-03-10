@@ -36,11 +36,11 @@
 /* ── Tabs ──────────────────────────────────────────────────── */
 .page__tabs {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.5rem;
     margin-bottom: 2.5rem;
     border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-    padding-bottom: 0;
+    padding: 0;
 }
 
 .page__tab {
@@ -96,8 +96,8 @@
 }
 
 .page__cta-btn--success {
-    background: #1a6b3a;
-    border-color: #1a6b3a;
+    background: #384a29;
+    border-color: #384a29;
     color: #fff;
 }
 
@@ -297,8 +297,7 @@ qty-control span {
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    max-width: 680px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 .form-row {
@@ -459,7 +458,6 @@ qty-control span {
 }
 
 .sidebar-title {
-    font-family: 'Outfit', sans-serif;
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--ink, #1a1a1a);
@@ -616,6 +614,8 @@ qty-control span {
     display: flex;
     flex-direction: column;
     width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .track-content-empty {
@@ -639,7 +639,7 @@ qty-control span {
 /* HEADER STRIP */
 .track-panel-header {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr auto;
     border: 1px solid var(--border, #e0e0e0);
     border-bottom: 0;
     border-radius: 12px 12px 0 0;
@@ -951,6 +951,7 @@ qty-control span {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
     color: var(--ink, #1a1a1a);
+    word-break: break-word;
 }
 
 .meta-value-notes {
@@ -958,6 +959,7 @@ qty-control span {
     font-size: 0.9rem;
     line-height: 1.5;
     color: var(--muted, #6b6b6b);
+    word-break: break-word;
 }
 
 /* BOTTOM BAR */
@@ -1792,5 +1794,35 @@ qty-control span {
     .shop-grid--full {
         grid-template-columns: repeat(2, 1fr);
         gap: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .track-app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .track-sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border, #e0e0e0);
+        padding: 2rem 1.5rem;
+    }
+
+    .track-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .custom-form .form-row,
+    .track-panel-header {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-col {
+        border-right: none;
+        border-bottom: 1px solid var(--border, #e0e0e0);
+    }
+
+    .panel-col:last-child {
+        border-bottom: none;
     }
 }

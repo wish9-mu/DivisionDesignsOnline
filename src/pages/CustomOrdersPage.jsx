@@ -21,6 +21,8 @@ const CustomOrdersPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const errorPopupRef = useRef(null);
 
+  const [hideGuestMsg, setHideGuestMsg] = useState(false);
+
   const triggerErrorPopup = (msg) => {
     setErrorMessage(msg);
     setShowErrorPopup(true);
@@ -71,17 +73,56 @@ const CustomOrdersPage = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const saved = localStorage.getItem("recentLookups");
-    if (saved) {
-      try { setRecentLookups(JSON.parse(saved)); } catch { /* ignore syntax error */ }
-    }
-  }, []);
+    const fetchUserOrders = async () => {
+      if (user?.id) {
+        try {
+          // Fetch up to 5 most recent orders for this explicit user
+          const { data, error } = await supabase
+            .from("custom_orders")
+            .select("*")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(5);
+
+          if (!error && data) {
+            setRecentLookups(data);
+          }
+        } catch (err) {
+          console.error("Error fetching user orders:", err);
+        }
+      } else {
+        // Fallback to guest lookups from localStorage
+        const saved = localStorage.getItem("recentLookups");
+        if (saved) {
+          try {
+            const allLookups = JSON.parse(saved);
+            setRecentLookups(allLookups["guest"] || []);
+          } catch { /* ignore syntax error */ }
+        } else {
+          setRecentLookups([]);
+        }
+      }
+    };
+
+    fetchUserOrders();
+  }, [user]);
 
   const saveLookup = (order) => {
+    // If the user is logged in, their lookup data is fetched from the DB
+    // We only need to save local history for guests
+    if (user?.id) return;
+
     setRecentLookups(prev => {
       const filtered = prev.filter(p => p.reference_id !== order.reference_id);
       const updated = [order, ...filtered].slice(0, 5);
-      localStorage.setItem("recentLookups", JSON.stringify(updated));
+
+      try {
+        const saved = localStorage.getItem("recentLookups");
+        const allLookups = saved ? JSON.parse(saved) : {};
+        allLookups["guest"] = updated;
+        localStorage.setItem("recentLookups", JSON.stringify(allLookups));
+      } catch { /* ignore */ }
+
       return updated;
     });
   };
@@ -159,7 +200,7 @@ const CustomOrdersPage = () => {
     if (s.includes("pending")) return { label: "Pending Review", className: "status-pending", stepIdx: 1 };
     if (s.includes("production")) return { label: "In Production", className: "status-production", stepIdx: 2 };
     if (s.includes("ready") || s.includes("shipped") || s.includes("complete")) return { label: "Completed", className: "status-ready", stepIdx: 3 };
-    return { label: "Submitted Request", className: "status-default", stepIdx: 0 };
+    return { label: "Submitted Order/Custom Request", className: "status-default", stepIdx: 0 };
   };
 
 
@@ -411,7 +452,7 @@ const CustomOrdersPage = () => {
   };
 
   return (
-    <Layout isFullWidth={activeTab === "Track Status"}>
+    <Layout isFullWidth={true}>
       {showErrorPopup && (
         <div
           ref={errorPopupRef}
@@ -462,17 +503,7 @@ const CustomOrdersPage = () => {
           </p>
         </div>
       )}
-      <div className={`page ${activeTab === "Track Status" ? "page--tracking" : ""}`}>
-        {activeTab !== "Track Status" && (
-          <div className="page__header">
-            <p className="page__eyebrow">Custom</p>
-            <h1 className="page__title">Custom Orders</h1>
-            <p className="page__subtitle">
-              Design your own lanyard — we'll bring it to life.
-            </p>
-          </div>
-        )}
-
+      <div className="page page--tracking">
         <div className="page__tabs">
           {["Submit Request", "Track Status"].map((tab) => (
             <button
@@ -487,165 +518,209 @@ const CustomOrdersPage = () => {
         </div>
 
         {activeTab === "Submit Request" && (
-          <form className="custom-form" onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Organization / Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Mapua University"
-                  required
-                  value={form.org_name}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, org_name: e.target.value }))
-                  }
-                />
+          <div className="track-app-shell">
+            {/* Left Sidebar */}
+            <div className="track-sidebar">
+              <div className="track-sidebar-header">
+                <span className="sidebar-eyebrow">Custom Orders</span>
+                <h2 className="sidebar-title">Submit<br />Request</h2>
+                <p className="sidebar-desc">Design your own lanyard — we'll bring it to life.</p>
               </div>
-              <div className="form-group">
-                <label>Contact Email</label>
-                <input
-                  type="email"
-                  placeholder="you@email.com"
-                  required
-                  value={form.contact_email}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, contact_email: e.target.value }))
-                  }
-                />
+              <div className="sidebar-recent" style={{ marginTop: '2rem' }}>
+                <p className="sidebar-desc" style={{ fontSize: '0.9rem' }}>
+                  Please fill out the details on the right to start your custom order.
+                  Once submitted, you'll receive a Reference ID to track your request.
+                </p>
               </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Quantity</label>
-                <input
-                  type="number"
-                  min="1"
-                  placeholder="e.g. 50"
-                  required
-                  value={form.quantity}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, quantity: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label>Material Type</label>
-                <select>
-                  <option>Polyester</option>
-                  <option>Polycotton</option>
-                </select>
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Lanyard Size</label>
-                <select>
-                  <option>1/2 inch</option>
-                  <option>3/4 inch</option>
-                  <option>1 inch</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Print Type</label>
-                <select>
-                  <option>Back to Back</option>
-                  <option>One Side</option>
-                </select>
-              </div>
-            </div>
-            <div className="form-group">
-              <label>Design Description</label>
-              <textarea
-                rows="4"
-                placeholder="Describe your design, colors, logo placement, text..."
-                required
-                value={form.design_description}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, design_description: e.target.value }))
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Reference Files (optional)</label>
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              />
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Appointment Date</label>
-                <button
-                  type="button"
-                  className="date-picker-btn"
-                  onClick={() => setShowDatePicker(true)}
-                >
-                  {form.appointment_date ? formatDate(form.appointment_date) : "Select Date"}
-                </button>
-                {showDatePicker && (
-                  <div className="date-picker-popup">
-                    <Calendar
-                      onChange={handleDateChange}
-                      value={form.appointment_date || new Date()}
-                      minDate={new Date()}
-                    />
+            {/* Right Content */}
+            <div className="track-content">
+              <div className="track-result-wrapper">
+                <div className="track-panel-header" style={{ gridTemplateColumns: '1fr' }}>
+                  <div className="panel-col" style={{ borderRight: 'none' }}>
+                    <span className="panel-label">Start Your Request</span>
+                    <h3 style={{ margin: '0.5rem 0 0', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.2rem', color: '#1a1a1a' }}>Custom Lanyard Specifications</h3>
                   </div>
-                )}
-              </div>
-              <div className="form-group">
-                <label>Appointment Time</label>
-                {!form.appointment_date ? (
-                  <div className="time-picker-container">
-                    <p className="muted" style={{ margin: "0.5rem 0" }}>Please select a date first</p>
-                  </div>
-                ) : (
-                  <div className="time-picker-container">
-                    {["Morning", "Afternoon", "Evening"].map((category) => {
-                      const slots = generateTimeSlots()
-                        .filter((time) => !isSlotTaken(time))
-                        .filter((time) => categorizeTime(time) === category);
+                </div>
 
-                      if (slots.length === 0) return null;
-
-                      return (
-                        <div key={category} className="time-category">
-                          <h5 className="time-category-title">{category}</h5>
-                          <div className="time-picker">
-                            {slots.map((time) => (
-                              <button
-                                key={time}
-                                type="button"
-                                className={`time-slot-btn${form.appointment_time === time ? " time-slot-btn--selected" : ""
-                                  }`}
-                                onClick={() => handleTimeSelect(time)}
-                              >
-                                {time}
-                              </button>
-                            ))}
-                          </div>
+                <div className="track-panel-body" style={{ gridTemplateColumns: '1fr' }}>
+                  <div className="progress-section" style={{ borderRight: 'none' }}>
+                    <form className="custom-form" onSubmit={handleSubmit} style={{ margin: 0, maxWidth: '100%', gap: '1.5rem' }}>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Organization / Name</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Mapua University"
+                            required
+                            value={form.org_name}
+                            onChange={(e) =>
+                              setForm((f) => ({ ...f, org_name: e.target.value }))
+                            }
+                          />
                         </div>
-                      );
-                    })}
+                        <div className="form-group">
+                          <label>Contact Email</label>
+                          <input
+                            type="email"
+                            placeholder="you@email.com"
+                            required
+                            value={form.contact_email}
+                            onChange={(e) =>
+                              setForm((f) => ({ ...f, contact_email: e.target.value }))
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Quantity</label>
+                          <input
+                            type="number"
+                            min="1"
+                            placeholder="e.g. 50"
+                            required
+                            value={form.quantity}
+                            onChange={(e) =>
+                              setForm((f) => ({ ...f, quantity: e.target.value }))
+                            }
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Material Type</label>
+                          <select>
+                            <option>Polyester</option>
+                            <option>Polycotton</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Lanyard Size</label>
+                          <select>
+                            <option>1/2 inch</option>
+                            <option>3/4 inch</option>
+                            <option>1 inch</option>
+                          </select>
+                        </div>
+                        <div className="form-group">
+                          <label>Print Type</label>
+                          <select>
+                            <option>Back to Back</option>
+                            <option>One Side</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Design Description</label>
+                        <textarea
+                          rows="4"
+                          placeholder="Describe your design, colors, logo placement, text..."
+                          required
+                          value={form.design_description}
+                          onChange={(e) =>
+                            setForm((f) => ({ ...f, design_description: e.target.value }))
+                          }
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Reference Files (optional)</label>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                        />
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Appointment Date</label>
+                          <button
+                            type="button"
+                            className="date-picker-btn"
+                            onClick={() => setShowDatePicker(true)}
+                          >
+                            {form.appointment_date ? formatDate(form.appointment_date) : "Select Date"}
+                          </button>
+                          {showDatePicker && (
+                            <div className="date-picker-popup">
+                              <Calendar
+                                onChange={handleDateChange}
+                                value={form.appointment_date || new Date()}
+                                minDate={new Date()}
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="form-group">
+                          <label>Appointment Time</label>
+                          {!form.appointment_date ? (
+                            <div className="time-picker-container">
+                              <p className="muted" style={{ margin: "0.5rem 0" }}>Please select a date first</p>
+                            </div>
+                          ) : (
+                            <div className="time-picker-container" style={{ maxHeight: '250px', overflowY: 'auto', padding: '1rem', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '8px' }}>
+                              {["Morning", "Afternoon", "Evening"].map((category) => {
+                                const slots = generateTimeSlots()
+                                  .filter((time) => !isSlotTaken(time))
+                                  .filter((time) => categorizeTime(time) === category);
+
+                                if (slots.length === 0) return null;
+
+                                return (
+                                  <div key={category} className="time-category" style={{ marginBottom: "1rem" }}>
+                                    <h5 className="time-category-title" style={{ fontSize: "0.85rem", margin: "0 0 0.5rem" }}>{category}</h5>
+                                    <div className="time-picker" style={{ gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+                                      {slots.map((time) => (
+                                        <button
+                                          key={time}
+                                          type="button"
+                                          className={`time-slot-btn${form.appointment_time === time ? " time-slot-btn--selected" : ""
+                                            }`}
+                                          onClick={() => handleTimeSelect(time)}
+                                          style={{ padding: "0.5rem" }}
+                                        >
+                                          {time}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {generatedRef && (
+                        <div style={{ padding: '1rem', background: '#edf1ea', border: '1px solid #c8d1c0', borderRadius: '8px', marginTop: '1rem' }}>
+                          <p style={{ textAlign: "center", color: "#384a29", margin: 0 }}>
+                            Your Reference ID: <b style={{ fontFamily: "'Roboto Mono', monospace", fontSize: '1.1rem' }}>{generatedRef}</b>
+                          </p>
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+                        <button
+                          type="submit"
+                          className={`page__cta-btn${submitted ? " page__cta-btn--success" : ""}`}
+                          style={{ margin: 0 }}
+                        >
+                          {submitted ? "✓ Request Sent!" : "Submit Request"}
+                        </button>
+                      </div>
+                    </form>
                   </div>
-                )}
+                </div>
               </div>
             </div>
-
-            {generatedRef && (
-              <p style={{ textAlign: "center", color: "#000" }}>
-                Your Reference ID: <b>{generatedRef}</b>
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className={`page__cta-btn${submitted ? " page__cta-btn--success" : ""}`}
-            >
-              {submitted ? "✓ Request Sent!" : "Submit Request"}
-            </button>
-          </form>
+          </div>
         )}
 
         {activeTab === "Track Status" && (
@@ -711,6 +786,50 @@ const CustomOrdersPage = () => {
 
             {/* Right Content */}
             <div className="track-content">
+              {!user && !hideGuestMsg && !trackResult && !trackError && !isTrackLoading && (
+                <div style={{
+                  background: "#fff",
+                  border: "1px solid rgba(0, 0, 0, 0.08)",
+                  borderRadius: "12px",
+                  padding: "1.5rem 2rem",
+                  marginBottom: "2.5rem",
+                  position: "relative",
+                  color: "#1a1a1a",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  boxShadow: "0 2px 12px rgba(0, 0, 0, 0.04)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.5rem"
+                }}>
+                  <button
+                    onClick={() => setHideGuestMsg(true)}
+                    style={{
+                      position: "absolute",
+                      top: "1rem",
+                      right: "1.2rem",
+                      background: "none",
+                      border: "none",
+                      fontSize: "1.2rem",
+                      cursor: "pointer",
+                      color: "rgba(0, 0, 0, 0.4)",
+                      transition: "color 0.2s"
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = "#8E1616"}
+                    onMouseLeave={(e) => e.target.style.color = "rgba(0, 0, 0, 0.4)"}
+                    aria-label="Dismiss message"
+                  >
+                    &times;
+                  </button>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <SearchX size={18} color="#8E1616" strokeWidth={2.5} />
+                    <h4 style={{ margin: 0, fontWeight: 800, fontSize: "1.05rem", fontFamily: "'Outfit', sans-serif" }}>Tracking your order?</h4>
+                  </div>
+                  <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.6, color: "#6b6b6b" }}>
+                    If you don't remember your specific Reference ID, you can <a href="/DivisionDesigns/sign-in" style={{ color: "#8E1616", fontWeight: "700", textDecoration: "none", borderBottom: "1px solid rgba(142, 22, 22, 0.3)", paddingBottom: "1px", transition: "border-color 0.2s" }} onMouseEnter={(e) => e.target.style.borderColor = "#8E1616"} onMouseLeave={(e) => e.target.style.borderColor = "rgba(142, 22, 22, 0.3)"}>sign in to your account</a> to automatically load your recent tracking history. Otherwise, use the search bar on the left if you have your ID handy.
+                  </p>
+                </div>
+              )}
+
               {!trackResult && !trackError && !isTrackLoading && (
                 <div className="track-content-empty">
                   <SearchX size={48} className="empty-icon-muted" style={{ margin: '0 auto 1.5rem', opacity: 0.15 }} />
@@ -731,7 +850,7 @@ const CustomOrdersPage = () => {
                   {(() => {
                     const statusInfo = getStatusInfo(trackResult.status);
                     const stages = [
-                      { key: "submitted", label: "Submitted Request", desc: "Order received and logged into the system." },
+                      { key: "submitted", label: "Submitted Order/Custom Request", desc: "Order received and logged into the system." },
                       { key: "pending_review", label: "Pending Review", desc: "Design specs reviewed and approved." },
                       { key: "in_production", label: "In Production", desc: "Printing underway at production facility." },
                       { key: "completed", label: "Completed", desc: "Order dispatched and on its way." }
@@ -745,15 +864,8 @@ const CustomOrdersPage = () => {
                             <span className="panel-value-id">{trackResult.reference_id}</span>
                           </div>
                           <div className="panel-col">
-                            <span className="panel-label">Organization</span>
+                            <span className="panel-label">Name / Organization</span>
                             <span className="panel-value">{trackResult.org_name}</span>
-                          </div>
-                          <div className="panel-col">
-                            <span className="panel-label">Current Status</span>
-                            <div className={`status-badge ${statusInfo.className}`}>
-                              <div className="status-dot"></div>
-                              {statusInfo.label}
-                            </div>
                           </div>
                           <div className="panel-col">
                             <span className="panel-label">Submitted</span>
@@ -809,14 +921,6 @@ const CustomOrdersPage = () => {
 
                           <div className="meta-rail">
                             <div className="meta-row">
-                              <span className="meta-label">Reference ID</span>
-                              <span className="meta-value-id">{trackResult.reference_id}</span>
-                            </div>
-                            <div className="meta-row">
-                              <span className="meta-label">Organization</span>
-                              <span className="meta-value">{trackResult.org_name}</span>
-                            </div>
-                            <div className="meta-row">
                               <span className="meta-label">Quantity</span>
                               <span className="meta-value">{trackResult.quantity} units</span>
                             </div>
@@ -838,8 +942,7 @@ const CustomOrdersPage = () => {
                             <span className="last-updated">Last updated &middot; {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &middot; {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                           <div className="bottom-right">
-                            <button className="btn-outline">Download PDF</button>
-                            <button className="btn-solid" onClick={() => window.location.href = '/contact'}>Contact Support</button>
+                            <button className="btn-solid" onClick={() => window.location.href = '/DivisionDesigns/contact'}>Contact Support</button>
                           </div>
                         </div>
                       </>

@@ -218,7 +218,6 @@ export const contactInfo = {
     title: 'Contact Information',
     details: [
         { label: 'Trade Name', value: 'Division Designs Co.' },
-        { label: 'Phone Number', value: '+63 900 000 0000' },
         { label: 'Email', value: 'support@divisiondesigns.com' },
         {
             label: 'Physical Address',

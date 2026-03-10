@@ -78,7 +78,7 @@ const AdminCustomOrders = ({
                 <td>
                   <select
                     className="admin__status-select"
-                    value={order.status || "Pending Review"}
+                    value={order.status || "Submitted Order/Custom Request"}
                     onChange={(e) =>
                       updateCustomStatus(order.id, e.target.value)
                     }

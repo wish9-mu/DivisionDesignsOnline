@@ -2,7 +2,7 @@
   "name": "division-designs",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://wissh-mu.github.io/DivisionDesigns",
+  "homepage": "https://wissh-mu.github.io/DivisionDesignsOnline",
   "type": "module",
   "scripts": {
     "dev": "vite",

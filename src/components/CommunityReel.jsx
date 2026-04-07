@@ -8,7 +8,8 @@ import { supabase } from "../supabaseClient";
 const REEL_DATA = [
   {
     id: 1,
-    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO1.MOV",
+    mediaUrl:
+      "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO1.MOV",
     mediaType: "video",
     username: "jane_doe",
     platform: "Instagram",
@@ -17,7 +18,8 @@ const REEL_DATA = [
   },
   {
     id: 2,
-    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO3.MOV",
+    mediaUrl:
+      "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO3.MOV",
     mediaType: "video",
     username: "alex_campus",
     platform: "TikTok",
@@ -26,7 +28,8 @@ const REEL_DATA = [
   },
   {
     id: 3,
-    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO4.MOV",
+    mediaUrl:
+      "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO4.MOV",
     mediaType: "video",
     username: "marky_m",
     platform: "Instagram",
@@ -35,7 +38,8 @@ const REEL_DATA = [
   },
   {
     id: 4,
-    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO2.MOV",
+    mediaUrl:
+      "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO2.MOV",
     mediaType: "video",
     username: "marky_m",
     platform: "Instagram",
@@ -44,18 +48,17 @@ const REEL_DATA = [
   },
   {
     id: 5,
-    mediaUrl: "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO5.MOV",
+    mediaUrl:
+      "https://eisgrbqpfycmstaetrnj.supabase.co/storage/v1/object/public/videos/PROMO5.MOV",
     mediaType: "video",
     username: "xluwish",
     platform: "Instagram",
     caption: "📸",
     productId: "b5c34d02-2345-6789-abcd-ef0123456789",
   },
-
-
 ];
 
-const ITEM_WIDTH = 300; // Includes gap (280px width + 20px gap)
+const ITEM_WIDTH = 260; // Includes gap (240px width + 20px gap)
 const VISIBLE_COUNT = 7;
 const CENTER_INDEX = Math.floor(VISIBLE_COUNT / 2);
 
@@ -173,7 +176,11 @@ const CommunityReel = () => {
                         loop
                         muted
                         playsInline
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
                       />
                     ) : item.mediaUrl ? (
                       <img
@@ -212,22 +219,7 @@ const CommunityReel = () => {
           </div>
         </div>
 
-        <div className="community-reel__controls">
-          <button
-            className="community-reel__nav-btn"
-            onClick={() => nudgeScroll(1)} // Left arrow nudges track right (positive targetX addition)
-            aria-label="Previous reel"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            className="community-reel__nav-btn"
-            onClick={() => nudgeScroll(-1)} // Right arrow nudges track left (negative targetX addition)
-            aria-label="Next reel"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
+        <div className="community-reel__controls"></div>
       </div>
     </section>
   );

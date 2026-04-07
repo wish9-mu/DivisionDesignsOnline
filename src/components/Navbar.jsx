@@ -35,7 +35,9 @@ const Navbar = () => {
   if (userName) {
     const nameParts = userName.trim().split(" ");
     if (nameParts.length >= 2) {
-      userInitials = (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+      userInitials = (
+        nameParts[0][0] + nameParts[nameParts.length - 1][0]
+      ).toUpperCase();
     } else if (nameParts.length === 1 && nameParts[0]) {
       userInitials = nameParts[0].substring(0, 2).toUpperCase();
     }
@@ -48,14 +50,23 @@ const Navbar = () => {
     let ctx;
     if (menuOpen && dropdownRef.current) {
       ctx = gsap.context(() => {
-        gsap.fromTo(dropdownRef.current,
+        gsap.fromTo(
+          dropdownRef.current,
           { opacity: 0, y: -10, scale: 0.95 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }
+          { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "power3.out" },
         );
         if (dropdownItemsRef.current.length > 0) {
-          gsap.fromTo(dropdownItemsRef.current,
+          gsap.fromTo(
+            dropdownItemsRef.current,
             { opacity: 0, x: -10 },
-            { opacity: 1, x: 0, duration: 0.2, stagger: 0.05, ease: "power2.out", delay: 0.1 }
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.2,
+              stagger: 0.05,
+              ease: "power2.out",
+              delay: 0.1,
+            },
           );
         }
       });
@@ -103,7 +114,10 @@ const Navbar = () => {
         } else {
           setIsAdmin(data?.role === "admin");
           // Extract name (prioritize full_name, fallback to first/last)
-          const fetchedName = data?.full_name || [data?.first_name, data?.last_name].filter(Boolean).join(" ") || "";
+          const fetchedName =
+            data?.full_name ||
+            [data?.first_name, data?.last_name].filter(Boolean).join(" ") ||
+            "";
           setUserName(fetchedName);
         }
       } catch (e) {
@@ -164,7 +178,12 @@ const Navbar = () => {
     // Reverse animation before actually signing out/closing
     if (dropdownRef.current) {
       gsap.to(dropdownRef.current, {
-        opacity: 0, y: -10, scale: 0.95, duration: 0.2, ease: "power2.in", onComplete: async () => {
+        opacity: 0,
+        y: -10,
+        scale: 0.95,
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: async () => {
           try {
             await signOut();
           } catch (e) {
@@ -172,7 +191,7 @@ const Navbar = () => {
           }
           setMenuOpen(false);
           navigate("/");
-        }
+        },
       });
     } else {
       try {
@@ -188,10 +207,15 @@ const Navbar = () => {
   const handleMenuCloseNavigate = (path) => {
     if (dropdownRef.current) {
       gsap.to(dropdownRef.current, {
-        opacity: 0, y: -10, scale: 0.95, duration: 0.2, ease: "power2.in", onComplete: () => {
+        opacity: 0,
+        y: -10,
+        scale: 0.95,
+        duration: 0.2,
+        ease: "power2.in",
+        onComplete: () => {
           setMenuOpen(false);
           navigate(path);
-        }
+        },
       });
     } else {
       setMenuOpen(false);
@@ -239,20 +263,30 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <div className={`navbar-links-container ${mobileMenuOpen ? "mobile-open" : ""}`}>
+      <div
+        className={`navbar-links-container ${mobileMenuOpen ? "mobile-open" : ""}`}
+      >
         <ul className="navbar-links">
           <li>
-            <Link to="/products" onClick={() => setMobileMenuOpen(false)}>Products</Link>
+            <Link to="/products" onClick={() => setMobileMenuOpen(false)}>
+              Products
+            </Link>
           </li>
           <li>
-            <Link to="/about" onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link to="/about" onClick={() => setMobileMenuOpen(false)}>
+              About
+            </Link>
           </li>
           <li>
-            <Link to="/custom-orders" onClick={() => setMobileMenuOpen(false)}>Orders</Link>
+            <Link to="/custom-orders" onClick={() => setMobileMenuOpen(false)}>
+              Orders
+            </Link>
           </li>
           {authReady && isAdmin && (
             <li>
-              <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>Admin</Link>
+              <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
+                Admin
+              </Link>
             </li>
           )}
         </ul>
@@ -352,15 +386,21 @@ const Navbar = () => {
                 <div className="profile-dropdown__header">
                   <div className="profile-dropdown__avatar">{userInitials}</div>
                   <div className="profile-dropdown__user-info">
-                    <span className="profile-dropdown__email">{user.email}</span>
-                    <span className="profile-dropdown__role">{isAdmin ? "Admin" : "Student"}</span>
+                    <span className="profile-dropdown__email">
+                      {user.email}
+                    </span>
+                    <span className="profile-dropdown__role">
+                      {isAdmin ? "Admin" : "Student"}
+                    </span>
                   </div>
                 </div>
               )}
 
               <div className="profile-dropdown__items">
                 {!authReady ? (
-                  <div className="profile-dropdown__item loading">Loading...</div>
+                  <div className="profile-dropdown__item loading">
+                    Loading...
+                  </div>
                 ) : !user ? (
                   <button
                     type="button"
@@ -389,7 +429,20 @@ const Navbar = () => {
                         ref={(el) => (dropdownItemsRef.current[1] = el)}
                         onClick={() => handleMenuCloseNavigate("/admin")}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></svg>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                          <path d="m9 12 2 2 4-4" />
+                        </svg>
                         <span>Admin Dashboard</span>
                       </button>
                     )}
@@ -397,7 +450,9 @@ const Navbar = () => {
                     <button
                       type="button"
                       className="profile-dropdown__item signout"
-                      ref={(el) => (dropdownItemsRef.current[isAdmin ? 2 : 1] = el)}
+                      ref={(el) =>
+                        (dropdownItemsRef.current[isAdmin ? 2 : 1] = el)
+                      }
                       onClick={handleSignOut}
                     >
                       <LogOut size={16} />
@@ -450,39 +505,17 @@ const Navbar = () => {
           </div>
 
           <div className="search-overlay-body">
-            <p className="search-popular-label">Popular Search Terms</p>
-            <div className="search-popular-tags">
-              {["t-shirts", "hoodies", "caps", "stickers", "jackets", "accessories", "new arrivals"].map(
-                (term) => (
-                  <button
-                    key={term}
-                    type="button"
-                    className="search-tag"
-                    onClick={() => {
-                      setSearchQuery(term);
-                      console.log("Searching for:", term);
-                      setSearchOpen(false);
-                    }}
-                  >
-                    {term}
-                  </button>
-                )
-              )}
-            </div>
             <div className="search-results">
-              {searchResults.length > 0 ? (
+              {searchResults.length > 0 &&
                 searchResults.map((result) => (
                   <div
                     key={result.id}
                     className="search-result-item"
                     onClick={() => handleResultClick(result.id)}
                   >
-                    <p>{result.name}</p>
+                    <p> {result.name}</p>
                   </div>
-                ))
-              ) : (
-                <p>No results found</p>
-              )}
+                ))}
             </div>
           </div>
         </div>

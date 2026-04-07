@@ -58,35 +58,35 @@
 
 .community-reel__track-wrapper {
     width: 100%;
-    max-width: 100%;
-    /* full width */
-    margin: 0;
+    max-width: 1600px;
+    margin: 0 auto;
     position: relative;
     display: flex;
-    justify-content: flex-start;
-    padding-left: 2rem;
-    /* small padding from left edge */
+    justify-content: center;
+    padding: 0 2rem;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .community-reel__track {
     display: flex;
     gap: 20px;
     padding: 1rem 0;
-    align-items: center;
+    align-items: stretch;
     will-change: transform;
+    justify-content: center;
+    width: 100%;
 }
 
 .community-reel__card-wrapper {
     cursor: pointer;
-    flex-shrink: 0;
-    width: 280px;
-    /* actual card width */
+    flex: 1 1 0;
+    max-width: 320px;
+    min-width: 220px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    /* space between card and chip */
     transform-origin: center center;
 }
 
@@ -262,8 +262,14 @@
         padding-left: 1rem;
     }
 
+    .community-reel__track {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
     .community-reel__card-wrapper {
-        width: 220px;
+        flex: 0 0 200px;
+        max-width: 200px;
     }
 }
 
@@ -273,10 +279,11 @@
     }
 
     .community-reel__card-wrapper {
-        width: 180px;
+        flex: 0 0 160px;
+        max-width: 160px;
     }
 
     .community-reel__track-wrapper {
-        padding-left: 0.75rem;
+        padding: 0 0.75rem;
     }
 }
